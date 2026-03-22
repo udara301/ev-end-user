@@ -1,0 +1,153 @@
+<section class="relative pt-32 pb-20 lg:pt-32 lg:pb-32 overflow-hidden">
+    <div class="absolute inset-0 z-0">
+        <div
+            class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/10 dark:from-primary/20 to-transparent">
+        </div>
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-secondary/20 rounded-full blur-3xl opacity-50"></div>
+        <div class="absolute top-1/2 -left-24 w-72 h-72 bg-tertiary/20 rounded-full blur-3xl opacity-50"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="lg:grid lg:grid-cols-12 lg:gap-16 items-center">
+            <div class="lg:col-span-7 text-center lg:text-left mb-12 lg:mb-0">
+                <span
+                    class="inline-block py-1 px-3 rounded-full bg-primary/10 dark:bg-primary/20 text-primary dark:text-secondary font-semibold text-sm mb-6 tracking-wide uppercase"
+                    style="">
+                    Sri Lanka's First Global EV Platform
+                </span>
+                <h1 class="text-5xl lg:text-6xl xl:text-7xl font-extrabold text-heading-light dark:text-heading-dark tracking-tight mb-6 leading-tight"
+                    style="">
+                    Explore&nbsp; Sri lanka,<br>
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-tertiary dark:from-secondary dark:to-tertiary"
+                        style="">Electric Way</span>
+                </h1>
+                <p class="text-lg lg:text-xl text-text-light dark:text-text-dark mb-10 max-w-2xl mx-auto lg:mx-0"
+                    style="">
+                    Experience sustainable travel with our premium electric vehicle fleet. One platform. Every
+                    solution. Seamless experience.
+                </p>
+                <div
+                    class="bg-surface-light dark:bg-surface-dark p-4 rounded-3xl shadow-xl dark:shadow-2xl border border-gray-100 dark:border-gray-800">
+                    <form class="gap-4 flex flex-col">
+                        <div class=" flex flex-col lg:flex-row">
+                            <div class="flex-1 relative gap-4 mr-4">
+                                <label
+                                    class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 px-2"
+                                    style="">Pickup Location</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <span class="material-icons text-sm" style="">place</span>
+                                    </span>
+                                    <select name="pickupLocation" id=""
+                                        class="block w-full pl-10 pr-3 py-3 border-none bg-gray-50 dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary dark:text-white">
+                                        <option *ngFor="let location of locations" [value]="location.location_id">{{
+                                            location.location_name }} (+{{location.price}})</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="flex-1 relative">
+                                <label
+                                    class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 px-2"
+                                    style="">Pickup Date</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <span class="material-icons text-sm" style="">calendar_today</span>
+                                    </span>
+                                    <input id="pickupDate" type="text" placeholder="Pickup Date"
+                                        class="block w-full pl-10 pr-3 py-3 border-none bg-gray-50 dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary dark:text-white">
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" flex flex-col lg:flex-row">
+                            <div class="flex-1 relative gap-4 mr-4">
+                                <label
+                                    class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 px-2"
+                                    style="">Return Location</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <span class="material-icons text-sm" style="">place</span>
+                                    </span>
+                                    <select name="dropOffLocation" id=""
+                                        class="block w-full pl-10 pr-3 py-3 border-none bg-gray-50 dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary dark:text-white">
+                                        <option *ngFor="let location of locations" [value]="location.location_id">{{
+                                            location.location_name }} (+{{location.price}})</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="flex-1 relative">
+                                <label
+                                    class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 px-2"
+                                    style="">Return Date</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <span class="material-icons text-sm" style="">calendar_today</span>
+                                    </span>
+                                    <input id="returnDate" type="text" placeholder="Return Date"
+                                        class="block w-full pl-10 pr-3 py-3 border-none bg-gray-50 dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary dark:text-white">
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" flex flex-col lg:flex-row">
+                            <div class="flex-1 relative">
+                                <label
+                                    class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 px-2"
+                                    style="">Vehicle Type</label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <span class="material-symbols-outlined text-sm" style="">directions_car</span>
+                                    </span>
+                                    <select
+                                        class="block w-full pl-10 pr-8 py-3 border-none bg-gray-50 dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary dark:text-white appearance-none cursor-pointer">
+                                        <option value="all">All Vehicles</option>
+                                        <option value="cars">EV Cars</option>
+                                        <option value="tuktuks">EV Tuk Tuks</option>
+                                        <option value="bikes">EV Bikes</option>
+                                    </select>
+                                    <span
+                                        class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+                                        <span class="material-icons text-sm" style="">expand_more</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-1 lg:self-end ml-4">
+                                <button
+                                    class="w-full lg:w-auto bg-secondary hover:bg-secondary/90 text-gray-900 px-8 py-3.5 rounded-xl font-bold transition-colors shadow-lg shadow-secondary/30 flex items-center justify-center gap-2"
+                                    type="submit" style="">
+                                    <span class="material-icons" style="">search</span>
+                                    Find EV
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="lg:col-span-5 relative">
+                <div class="relative rounded-3xl overflow-hidden shadow-2xl">
+                    <img alt="Modern Electric Vehicle"
+                        class="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUMc_fyUNt5K1yggJWmt-cY8wSjGkVvgIoFEwfncnTXHVL9tzsO36cD7gE_4l3z5OUOgVfAhNsCH2T4se_-unhj-CpXg3-3YfvZOxlAT-rCNcUZrXTdwEMj7ZLDewTyiKVMhWIK_Yt2oXegEjecuL4hZj9pfI51hwLlgvNxhJ7j_yPSISEr7FAjQM-LyGVaoXxcC0RSh431p9Z1R6FjIxWm1bbhOvzePbY5pfLXJiDYjjAh3Y7FAMIDUCFFM2wTgEXMK_XugQQcYf6"
+                        style="">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div class="absolute bottom-6 left-6 right-6">
+                        <div
+                            class="flex items-center gap-3 bg-white/20 backdrop-blur-md rounded-2xl p-4 border border-white/30 text-white w-max">
+                            <span class="material-icons text-secondary" style="">bolt</span>
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wider opacity-80" style="">Fully
+                                    Charged</p>
+                                <p class="font-bold text-lg" style="">Ready to go</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

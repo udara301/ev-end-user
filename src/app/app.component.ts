@@ -1,10 +1,15 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './components/header/header.component';
+import { HeroComponent } from './components/hero/hero.component';
+import { VehiclesComponent } from './components/vehicles/vehicles.component';
+import { NetworkComponent } from './components/network/network.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, HeaderComponent, HeroComponent, VehiclesComponent, NetworkComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
