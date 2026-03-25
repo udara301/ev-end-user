@@ -1,0 +1,261 @@
+<section class="relative min-h-screen overflow-hidden bg-white pt-28 pb-16">
+    <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-white to-secondary/15"></div>
+        <div class="absolute -left-10 top-24 h-64 w-64 rounded-full bg-tertiary/20 blur-3xl"></div>
+        <div class="absolute -right-14 bottom-10 h-72 w-72 rounded-full bg-primary/20 blur-3xl"></div>
+    </div>
+
+    <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-8 rounded-3xl border border-white/70 bg-white/80 p-4 shadow-xl backdrop-blur-xl sm:p-6">
+            <div
+                class="bg-surface-light dark:bg-surface-dark p-4 rounded-3xl shadow-xl dark:shadow-2xl border border-gray-100 dark:border-gray-800">
+                <div class="gap-4 flex flex-col">
+                    <div class=" flex flex-col lg:flex-row">
+                        <div class="flex-1 relative gap-4 mr-4">
+                            <label
+                                class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 px-2">Pickup
+                                Location</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                    <span class="material-icons text-sm">place</span>
+                                </span>
+                                <select name="pickupLocation" id="pickupLocation" [(ngModel)]="selectedPickupLocation"
+                                    class="block w-full pl-10 pr-3 py-3 border-none bg-gray-50 dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary dark:text-white">
+                                    <option *ngFor="let location of locations" [value]="location.location_id">{{
+                                        location.location_name }} (+{{location.price}})</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="flex-1 relative">
+                            <label
+                                class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 px-2">Pickup
+                                Date</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                    <span class="material-icons text-sm">calendar_today</span>
+                                </span>
+                                <input id="pickupDate" type="text" placeholder="Pickup Date"
+                                    [(ngModel)]="selectedPickupDate"
+                                    class="block w-full pl-10 pr-3 py-3 border-none bg-gray-50 dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" flex flex-col lg:flex-row">
+                        <div class="flex-1 relative gap-4 mr-4">
+                            <label
+                                class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 px-2">Return
+                                Location</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                    <span class="material-icons text-sm">place</span>
+                                </span>
+                                <select name="dropOffLocation" id="dropOffLocation"
+                                    [(ngModel)]="selectedDropoffLocation"
+                                    class="block w-full pl-10 pr-3 py-3 border-none bg-gray-50 dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary dark:text-white">
+                                    <option *ngFor="let location of locations" [value]="location.location_id">{{
+                                        location.location_name }} (+{{location.price}})</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="flex-1 relative">
+                            <label
+                                class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 px-2">Return
+                                Date</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                    <span class="material-icons text-sm">calendar_today</span>
+                                </span>
+                                <input id="returnDate" type="text" placeholder="Return Date"
+                                    [(ngModel)]="selectedDropoffDate"
+                                    class="block w-full pl-10 pr-3 py-3 border-none bg-gray-50 dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="flex justify-between">
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <button (click)="setCategory('all')" class="rounded-full px-4 py-2 text-sm font-semibold transition"
+                        [ngClass]="selectedCategory === 'all' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                        All
+                    </button>
+                    <button (click)="setCategory('car')" class="rounded-full px-4 py-2 text-sm font-semibold transition"
+                        [ngClass]="selectedCategory === 'car' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                        Cars
+                    </button>
+                    <button (click)="setCategory('tuktuk')"
+                        class="rounded-full px-4 py-2 text-sm font-semibold transition"
+                        [ngClass]="selectedCategory === 'tuktuk' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                        Tuk Tuks
+                    </button>
+                    <button (click)="setCategory('bike')"
+                        class="rounded-full px-4 py-2 text-sm font-semibold transition"
+                        [ngClass]="selectedCategory === 'bike' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                        Bikes
+                    </button>
+                    <button (click)="setCategory('scooter')"
+                        class="rounded-full px-4 py-2 text-sm font-semibold transition"
+                        [ngClass]="selectedCategory === 'scooter' ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                        Scooters
+                    </button>
+                </div>
+                <div class="flex flex-col lg:flex-row gap-3">
+                    <div class="lg:self-end ml-4">
+                        <button (click)="searchVehicles()"
+                            class="w-full lg:w-auto bg-secondary hover:bg-secondary/90 text-gray-900 px-8 py-2.5 mt-5 rounded-xl font-bold transition-colors shadow-lg shadow-secondary/30 flex items-center justify-center gap-2"
+                            type="button">
+                            <span class="material-icons">search</span>
+                            Find EV
+                        </button>
+                    </div>
+
+                    <div class="lg:self-end">
+                        <button (click)="clearSearch()"
+                            class="w-full lg:w-auto border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 px-8 py-2.5 mt-5 rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
+                            type="button">
+                            <span class="material-icons">clear</span>
+                            Clear Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <aside class="rounded-3xl border border-slate-100 bg-white p-6 shadow-lg lg:col-span-3 lg:self-start">
+                <div class="mb-5 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-900">Filters</h3>
+                    <button (click)="clearFilters()"
+                        class="text-sm font-semibold text-primary hover:text-primary/80">Reset</button>
+                </div>
+
+                <div class="space-y-5">
+                    <div>
+                        <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Price
+                            Band</label>
+                        <select [(ngModel)]="selectedPriceBand"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-slate-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30">
+                            <option value="all">Any Budget</option>
+                            <option value="budget">Budget (under $ 80)</option>
+                            <option value="mid">Mid ($ 80 - 150)</option>
+                            <option value="premium">Premium ($ 150+)</option>
+                        </select>
+                    </div>
+
+                    <!-- <div>
+                        <label
+                            class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Transmission</label>
+                        <select [(ngModel)]="selectedTransmission"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-slate-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30">
+                            <option value="all">All</option>
+                            <option value="Auto">Auto</option>
+                            <option value="Manual">Manual</option>
+                        </select>
+                    </div> -->
+
+                    <!-- <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
+                        <input type="checkbox" [(ngModel)]="onlyFastCharge"
+                            class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                        Fast charging only
+                    </label> -->
+
+                    <div>
+                        <label class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Sort
+                            By</label>
+                        <select [(ngModel)]="sortBy"
+                            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-slate-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30">
+                            <option value="recommended">Recommended</option>
+                            <option value="priceLowHigh">Price: Low to High</option>
+                            <option value="rangeHighLow">Range: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="lg:col-span-9">
+                <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="text-2xl font-extrabold text-slate-900">Available Vehicles</h2>
+                    <p class="rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-slate-600 shadow">
+                        {{ filteredVehicles.length }} results found
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    <article *ngFor="let vehicle of filteredVehicles"
+                        class="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                        <div class="relative h-44 overflow-hidden bg-slate-100">
+                            <img [src]="vehicle.image_url" [alt]="vehicle.model_name"
+                                class="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105" />
+                            <span
+                                class="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-xs font-bold text-slate-700">
+                                <span class="material-icons text-sm">{{ categoryIcon(vehicle.category) }}</span>
+                                {{ vehicle.category | titlecase }}
+                            </span>
+                        </div>
+
+                        <div class="p-5">
+                            <div class="mb-4 flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-900">{{ vehicle.model_name }}</h3>
+                                    <p class="text-sm text-slate-500">{{ vehicle.brand }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xl font-extrabold text-primary">$ {{ vehicle.base_price_per_day |
+                                        number }}</p>
+                                    <p class="text-xs text-slate-500">/ day</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-4 grid grid-cols-3 gap-2 border-y border-slate-100 py-4">
+                                <div class="text-center">
+                                    <span class="material-icons mb-1 block text-sm text-slate-400">speed</span>
+                                    <p class="text-xs font-semibold text-slate-700">{{ vehicle.range_per_charge }} km
+                                    </p>
+                                </div>
+                                <div class="border-x border-slate-100 text-center">
+                                    <span
+                                        class="material-icons mb-1 block text-sm text-slate-400">airline_seat_recline_normal</span>
+                                    <p class="text-xs font-semibold text-slate-700">{{ vehicle.passenger_count }} seats
+                                    </p>
+                                </div>
+                                <div class="text-center">
+                                    <span class="material-icons mb-1 block text-sm text-slate-400">battery_full</span>
+                                    <p class="text-xs font-semibold text-slate-700">{{ vehicle.battery_capacity }} kWh
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mb-4 flex items-center justify-between text-xs text-slate-500">
+                                <span>Power: <strong class="text-slate-700">{{ vehicle.motor_power }} kW</strong></span>
+                                <!-- <span 
+                                    class="rounded-full bg-secondary/20 px-2 py-1 font-semibold text-slate-700">Fast
+                                    Charge</span> -->
+                            </div>
+
+                            <button
+                                type="button"
+                                (click)="reserveVehicle(vehicle)"
+                                class="w-full rounded-xl bg-primary/10 py-2.5 font-semibold text-primary transition hover:bg-primary hover:text-white">
+                                Reserve Vehicle
+                            </button>
+                        </div>
+                    </article>
+                </div>
+
+                <div *ngIf="filteredVehicles.length === 0"
+                    class="rounded-3xl border border-dashed border-slate-300 bg-white/70 p-10 text-center">
+                    <span class="material-icons mb-2 text-4xl text-slate-400">search_off</span>
+                    <p class="text-lg font-semibold text-slate-700">No vehicles match your filters.</p>
+                    <p class="mt-1 text-sm text-slate-500">Try resetting filters or changing your category.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

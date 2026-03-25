@@ -1,0 +1,111 @@
+<section class="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 pt-32 pb-16">
+  <div class="absolute inset-0 z-0">
+    <div class="absolute -top-24 right-0 h-96 w-96 rounded-full bg-cyan-200/30 blur-3xl"></div>
+    <div class="absolute -bottom-24 left-0 h-80 w-80 rounded-full bg-blue-200/30 blur-3xl"></div>
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-slate-900 mb-2">Charging Network</h1>
+      <p class="text-lg text-slate-600">Find public EV charging stations across the island.</p>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+      <!-- Map -->
+      <div class="lg:col-span-2">
+        <div class="rounded-3xl border border-white/70 bg-white/90 shadow-xl shadow-slate-900/5 backdrop-blur-md overflow-hidden">
+          <div *ngIf="!mapReady" class="h-[600px] w-full flex items-center justify-center">
+            <span class="material-icons animate-pulse text-4xl text-primary">map</span>
+          </div>
+          <google-map *ngIf="mapReady"
+            width="100%"
+            height="600px"
+            [center]="mapCenter"
+            [zoom]="mapZoom"
+            [options]="mapOptions">
+
+            <map-marker
+              *ngFor="let charger of chargers"
+              #markerRef="mapMarker"
+              [position]="getPosition(charger)"
+              [options]="markerOptions"
+              (mapClick)="openInfoWindow(markerRef, charger)">
+            </map-marker>
+
+            <map-info-window>
+              <div *ngIf="selectedCharger" class="p-1" style="min-width:220px">
+                <h3 class="text-base font-bold text-slate-900 mb-1">{{ selectedCharger.place_name }}</h3>
+                <p *ngIf="selectedCharger.description" class="text-sm text-slate-500 mb-2">{{ selectedCharger.description }}</p>
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  <span class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-700">
+                    {{ selectedCharger.connector_type }}
+                  </span>
+                  <span *ngIf="selectedCharger.is_verified" class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700">
+                    Verified
+                  </span>
+                  <span *ngIf="!selectedCharger.is_verified" class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                    Unverified
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-400">Submitted by {{ selectedCharger.submitted_by_name }}</p>
+              </div>
+            </map-info-window>
+          </google-map>
+        </div>
+      </div>
+
+      <!-- Charger List Sidebar -->
+      <div class="space-y-4">
+        <div class="rounded-3xl border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-md">
+          <h2 class="text-xl font-bold text-slate-900 mb-1">Stations</h2>
+          <p class="text-sm text-slate-500 mb-4">{{ chargers.length }} charging station{{ chargers.length !== 1 ? 's' : '' }} found</p>
+
+          <div *ngIf="isLoading" class="flex items-center justify-center py-12">
+            <span class="material-icons animate-pulse text-4xl text-primary">ev_station</span>
+          </div>
+
+          <div *ngIf="!isLoading" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+            <div *ngFor="let charger of chargers"
+              (click)="selectCharger(charger)"
+              class="cursor-pointer rounded-2xl border p-4 transition hover:shadow-md"
+              [ngClass]="selectedCharger?.id === charger.id 
+                ? 'border-primary bg-primary/5 shadow-md' 
+                : 'border-slate-200 bg-white hover:border-slate-300'">
+              
+              <div class="flex items-start gap-3">
+                <span class="mt-0.5 rounded-full p-2" 
+                  [ngClass]="charger.is_verified ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'">
+                  <span class="material-icons text-lg">ev_station</span>
+                </span>
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-bold text-slate-900 truncate">{{ charger.place_name }}</h3>
+                  <p *ngIf="charger.description" class="text-xs text-slate-500 mt-0.5 truncate">{{ charger.description }}</p>
+                  
+                  <div class="flex flex-wrap items-center gap-2 mt-2">
+                    <span class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-700">
+                      {{ charger.connector_type }}
+                    </span>
+                    <span *ngIf="charger.is_verified" class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700">
+                      <span class="material-icons text-xs mr-0.5">verified</span> Verified
+                    </span>
+                    <span *ngIf="!charger.is_verified" class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                      Unverified
+                    </span>
+                  </div>
+
+                  <p class="text-[11px] text-slate-400 mt-2">By {{ charger.submitted_by_name }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="chargers.length === 0" class="py-8 text-center">
+              <span class="material-icons text-4xl text-slate-300">search_off</span>
+              <p class="mt-2 text-sm text-slate-500">No charging stations found.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

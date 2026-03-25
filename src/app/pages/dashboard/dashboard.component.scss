@@ -1,0 +1,11 @@
+.dashboard-glass {
+	background: linear-gradient(145deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.58));
+	backdrop-filter: blur(18px);
+}
+
+.dashboard-panel {
+	background:
+		radial-gradient(circle at top left, rgba(45, 212, 191, 0.18), transparent 30%),
+		radial-gradient(circle at bottom right, rgba(250, 204, 21, 0.18), transparent 28%),
+		linear-gradient(160deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.92));
+}

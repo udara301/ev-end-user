@@ -1,0 +1,8 @@
+{
+
+  "/uploads": {
+    "target": "https://drivewithev.com",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

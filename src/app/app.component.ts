@@ -5,11 +5,12 @@ import { HeroComponent } from './components/hero/hero.component';
 import { VehiclesComponent } from './components/vehicles/vehicles.component';
 import { NetworkComponent } from './components/network/network.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { HomeComponent } from './pages/home/home.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, HeroComponent, VehiclesComponent, NetworkComponent, FooterComponent],
+  imports: [RouterOutlet, HeaderComponent, HomeComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

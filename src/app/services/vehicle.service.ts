@@ -16,4 +16,8 @@ export class VehicleService {
 	getVehicleById(id: string | number) {
 		return this.http.get(`${this.base}/${id}`);
 	}
+
+	getAllVehiclesByCategory() {
+		return this.http.get(`${this.base}/category`);
+	}
 }

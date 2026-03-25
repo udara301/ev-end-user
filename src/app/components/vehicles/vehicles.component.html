@@ -8,66 +8,75 @@
             </div>
             <div class="flex justify-center mb-12 overflow-x-auto pb-2">
                 <div class="inline-flex bg-gray-100 dark:bg-gray-800 rounded-2xl p-1.5 whitespace-nowrap">
-                    <button
-                        class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-secondary font-bold transition-all"
-                        style="">
+                    <button (click)="selectCategory('car')"
+                        class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary font-semibold transition-all"
+                        style="" [ngClass]="{'bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-secondary font-bold': selectedCategory === 'car'}"
+                        >
                         <span class="material-symbols-outlined" style="">directions_car</span>
                         Cars
                     </button>
-                    <button
+                    <button (click)="selectCategory('tuktuk')"
                         class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary font-semibold transition-all"
-                        style="">
+                        style="" [ngClass]="{'bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-secondary font-bold': selectedCategory === 'tuktuk'}"
+                        >
                         <span class="material-symbols-outlined" style="">electric_rickshaw</span>
                         Tuk Tuks
                     </button>
-                    <button
+                    <button (click)="selectCategory('bike')"
                         class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary font-semibold transition-all"
-                        style="">
+                        style="" [ngClass]="{'bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-secondary font-bold': selectedCategory === 'bike'}"
+                            >
                         <span class="material-symbols-outlined" style="">electric_bike</span>
                         Bikes
+                    </button>
+                    <button (click)="selectCategory('scooter')"
+                        class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-secondary font-semibold transition-all"
+                        style="" [ngClass]="{'bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-secondary font-bold': selectedCategory === 'scooter'}"
+                        >
+                        <span class="material-symbols-outlined" style="">electric_scooter</span>
+                        Scooters
                     </button>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div
+                <div *ngFor="let vehicle of selectedVehicles"
                     class="bg-surface-light dark:bg-surface-dark rounded-3xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-xl transition-shadow duration-300 group">
                     <div class="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-800">
-                        <img alt="Tesla Model 3"
+                        <img alt="{{ vehicle.model_name }}"
                             class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWwMSpIfvWzx3oHs0eNOR6WtpAaqc97Ymv0WJB75Jfyjh1_lC0rDiP5XrXHGyyAYFhFepa2e0yDiN0U3KvqT3Ke36BdTzHq6VG5rB25cwfqFZ48PaKMgesjBuqvPdhgrCOTwYRJ2CRZb0jOMamP2AF5e2Yrs1_Qopbt-Yyc9yZNA_7Z5HpVUjB7ePNG-8sylgbT452fiX6xboMWC0jh8s9WxCQ3nt5k4Y8u2eUfq_z1tmXSxmmquuSbZ3XMcP8hnlTwYAnPK01hHGW"
+                            [src]="vehicle.image_url"
                             style="">
-                        <div class="absolute top-4 right-4 bg-white dark:bg-gray-900 px-3 py-1 rounded-full text-xs font-bold text-primary dark:text-secondary shadow-sm"
+                        <!-- <div class="absolute top-4 right-4 bg-white dark:bg-gray-900 px-3 py-1 rounded-full text-xs font-bold text-primary dark:text-secondary shadow-sm"
                             style="">
                             Premium
-                        </div>
+                        </div> -->
                     </div>
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <h3 class="text-xl font-bold text-heading-light dark:text-heading-dark" style="">Tesla
-                                    Model 3</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400" style="">Long Range AWD</p>
+                                <h3 class="text-xl font-bold text-heading-light dark:text-heading-dark" style=""> {{ vehicle.model_name }}</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400" style="">{{ vehicle.brand }}</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-2xl font-bold text-primary dark:text-white" style="">$85</p>
+                                <p class="text-2xl font-bold text-primary dark:text-white" style="">$: {{vehicle.base_price_per_day}}</p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400" style="">/ day</p>
                             </div>
                         </div>
                         <div class="grid grid-cols-3 gap-2 mb-6 border-y border-gray-100 dark:border-gray-800 py-4">
                             <div class="text-center">
                                 <span class="material-icons text-gray-400 text-sm mb-1 block" style="">speed</span>
-                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">358 mi
+                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">{{ vehicle.range_per_charge }} km per charge
                                 </p>
                             </div>
                             <div class="text-center border-x border-gray-100 dark:border-gray-800">
                                 <span class="material-icons text-gray-400 text-sm mb-1 block"
                                     style="">airline_seat_recline_normal</span>
-                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">5
+                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style=""> {{ vehicle.passenger_count }}
                                     Seats</p>
                             </div>
                             <div class="text-center">
-                                <span class="material-icons text-gray-400 text-sm mb-1 block" style="">settings</span>
-                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">Auto
+                                <span class="material-icons text-gray-400 text-sm mb-1 block" style="">battery_full</span>
+                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">{{vehicle.battery_capacity}} kWh Battery
                                 </p>
                             </div>
                         </div>
@@ -78,105 +87,7 @@
                         </button>
                     </div>
                 </div>
-                <div
-                    class="bg-surface-light dark:bg-surface-dark rounded-3xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-xl transition-shadow duration-300 group">
-                    <div class="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-800">
-                        <img alt="Hyundai Ioniq 5"
-                            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf7WIPV2eP5rKmYc4qh73KFYURbDqGqB8PTbU5fzKQzDrj3SHg8VLeUEquI0NDq-8C15g69tiMIVEFzzZ1JJsFjJTJLiZkggBUUnfjkiQ0oJN4z1e3W0Fixq5FD8rDYga30CJjBHzCJ5C3RCYZKhFOn69eyki_n1Jw9gqnPHezSe64VTIT65PWfjFT1Cyk5h01R8MXdbE6W-Uit-C_35c9qwlicRlGODqJ8RZfZxx7v9X5gU9lEthb2xZ39_TQgtB7wKWZp29lO0a8"
-                            style="">
-                        <div class="absolute top-4 right-4 bg-white dark:bg-gray-900 px-3 py-1 rounded-full text-xs font-bold text-tertiary shadow-sm"
-                            style="">
-                            Popular
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-xl font-bold text-heading-light dark:text-heading-dark" style="">Hyundai
-                                    Ioniq 5</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400" style="">SEL RWD</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-2xl font-bold text-primary dark:text-white" style="">$75</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400" style="">/ day</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 mb-6 border-y border-gray-100 dark:border-gray-800 py-4">
-                            <div class="text-center">
-                                <span class="material-icons text-gray-400 text-sm mb-1 block" style="">speed</span>
-                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">303 mi
-                                </p>
-                            </div>
-                            <div class="text-center border-x border-gray-100 dark:border-gray-800">
-                                <span class="material-icons text-gray-400 text-sm mb-1 block"
-                                    style="">airline_seat_recline_normal</span>
-                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">5
-                                    Seats</p>
-                            </div>
-                            <div class="text-center">
-                                <span class="material-icons text-gray-400 text-sm mb-1 block" style="">settings</span>
-                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">Auto
-                                </p>
-                            </div>
-                        </div>
-                        <button
-                            class="w-full bg-primary/10 hover:bg-primary text-primary hover:text-white dark:bg-gray-800 dark:hover:bg-primary dark:text-white py-3 rounded-xl font-semibold transition-colors duration-300"
-                            style="">
-                            Book Now
-                        </button>
-                    </div>
-                </div>
-                <div
-                    class="bg-surface-light dark:bg-surface-dark rounded-3xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-800 hover:shadow-xl transition-shadow duration-300 group">
-                    <div
-                        class="relative h-48 overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                        <img alt="BYD Atto 3"
-                            class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiprnRbcqaWom9sX894nrTwFKUV5MXobO-PDk8jmAi4Jg0nJxTciV6TNNGXSl4yi4i30-BRkN7e5Z-nEHw0rbe3GRL2EoaKD7vDXY37Zgcwm8DNgjzQ2894QMbwuM9LAWewj143TbFdo6dYdlDZRH830r1pQcD3X9FXs-dlKlBoW9c_EfQDma6OJWO-QfMeZZLgjT7Hw9eG8LUgIhFWkj1Wsq3r0g-5wBDW9MVyC-RSDri8YIwGDA-ZPxA2MCWWTss-Kv_MWetKjHO"
-                            style="">
-                        <div class="absolute top-4 right-4 bg-white dark:bg-gray-900 px-3 py-1 rounded-full text-xs font-bold text-secondary shadow-sm"
-                            style="">
-                            Eco
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="text-xl font-bold text-heading-light dark:text-heading-dark" style="">BYD
-                                    Atto 3</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400" style="">Extended Range</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-2xl font-bold text-primary dark:text-white" style="">$60</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400" style="">/ day</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 mb-6 border-y border-gray-100 dark:border-gray-800 py-4">
-                            <div class="text-center">
-                                <span class="material-icons text-gray-400 text-sm mb-1 block" style="">speed</span>
-                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">260 mi
-                                </p>
-                            </div>
-                            <div class="text-center border-x border-gray-100 dark:border-gray-800">
-                                <span class="material-icons text-gray-400 text-sm mb-1 block"
-                                    style="">airline_seat_recline_normal</span>
-                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">5
-                                    Seats</p>
-                            </div>
-                            <div class="text-center">
-                                <span class="material-icons text-gray-400 text-sm mb-1 block" style="">settings</span>
-                                <p class="text-xs font-medium text-heading-light dark:text-heading-dark" style="">Auto
-                                </p>
-                            </div>
-                        </div>
-                        <button
-                            class="w-full bg-primary/10 hover:bg-primary text-primary hover:text-white dark:bg-gray-800 dark:hover:bg-primary dark:text-white py-3 rounded-xl font-semibold transition-colors duration-300"
-                            style="">
-                            Book Now
-                        </button>
-                    </div>
-                </div>
+
             </div>
             <div class="mt-12 text-center">
                 <a class="inline-flex items-center gap-2 text-primary dark:text-secondary font-semibold hover:underline"
