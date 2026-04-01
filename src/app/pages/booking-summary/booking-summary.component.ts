@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LocationService } from '../../services/location.service';
 import { LocalStorageService } from '../../services/localStorage.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { BookingService } from '../../services/booking.service';
+import { PaymentService } from '../../services/payment.service';
+import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 interface BookingSummaryData {
   vehicle: {
@@ -48,8 +51,12 @@ export class BookingSummaryComponent implements OnInit {
   private readonly vehicleService = inject(VehicleService);
   private readonly locationService = inject(LocationService);
   private readonly bookingService = inject(BookingService);
+  private readonly paymentService = inject(PaymentService);
+  private readonly authService = inject(AuthService);
+  private readonly ngZone = inject(NgZone);
 
   bookingData: BookingSummaryData = null as any;
+  paymentError = '';
 
   acceptTerms = false;
   isLoading = true;
@@ -98,6 +105,7 @@ export class BookingSummaryComponent implements OnInit {
     }
 
     this.isSubmitting = true;
+    this.paymentError = '';
 
     this.bookingService.placeBooking(
       this.bookingData.vehicle.vehicle_id!,
@@ -107,16 +115,98 @@ export class BookingSummaryComponent implements OnInit {
       this.dropoffTime,
       this.totalCost
     ).subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.localStorageService.clearSearchCriteria();
-        this.localStorageService.clearSelectedVehicle();
-        this.router.navigate(['/dashboard']);
+      next: (res: any) => {
+        const orderId = res?.bookingId ?? res?.order_id ?? res?.id;
+        if (!orderId) {
+          this.isSubmitting = false;
+          this.paymentError = 'Booking created but no order ID returned. Please contact support.';
+          return;
+        }
+        this.initiatePayment(String(orderId));
       },
       error: (err) => {
         this.isSubmitting = false;
-        const message = err?.error?.message || 'Failed to place booking. Please try again.';
-        alert(message);
+        this.paymentError = err?.error?.message || 'Failed to place booking. Please try again.';
+      }
+    });
+  }
+
+  private initiatePayment(orderId: string): void {
+    const amount = this.totalCost;
+    const currency = 'LKR';
+
+    this.paymentService.getPaymentHash({ order_id: orderId, amount, currency }).subscribe({
+      next: (hashRes) => {
+        const user = this.authService.getUserFromToken();
+        const fullName = (user?.name || 'Customer').split(' ');
+        const firstName = fullName[0] || 'Customer';
+        const lastName = fullName.slice(1).join(' ') || '-';
+        const amountFormatted = Number(amount).toFixed(2);
+        // Temp usage 
+        const payment = {
+            "sandbox": true,
+            "merchant_id": environment.payhereMerchantId,
+            "return_url": "http://localhost:4200/success",
+            "cancel_url": "http://localhost:4200/cancel",
+            "notify_url": "http://your-backend-api.com/api/payments/notify", // පේමන්ට් එක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
+            "order_id": orderId,
+            "items": `${this.bookingData.vehicle.brand} ${this.bookingData.vehicle.model_name} Rental`,
+            "amount": amountFormatted,
+            "currency": currency,
+            "hash": hashRes.hash, // අර අපි හදපු hash එක
+            "first_name": "Saman",
+            "last_name": "Perera",
+            "email": "samanp@gmail.com",
+            "phone": "0771234567",
+            "address": "No.1, Galle Road",
+            "city": "Colombo",
+            "country": "Sri Lanka",
+        };
+
+        //  {
+        //     merchant_id: environment.payhereMerchantId,
+        //     order_id: orderId,
+        //     items: `${this.bookingData.vehicle.brand} ${this.bookingData.vehicle.model_name} Rental`,
+        //     amount,
+        //     currency,
+        //     hash: hashRes.hash,
+        //     first_name: firstName,
+        //     last_name: lastName,
+        //     email: user?.email || '',
+        //     phone: user?.phone || '',
+        //     address: '-',
+        //     city: 'Colombo',
+        //     country: 'Sri Lanka',
+        //   }
+        this.paymentService.startPayment(
+         payment,
+          {
+            onCompleted: (completedOrderId: string) => {
+              this.ngZone.run(() => {
+                this.isSubmitting = false;
+                this.localStorageService.clearSearchCriteria();
+                this.localStorageService.clearSelectedVehicle();
+                this.router.navigate(['/dashboard']);
+              });
+            },
+            onDismissed: () => {
+              this.ngZone.run(() => {
+                this.isSubmitting = false;
+                this.paymentError = 'Payment was cancelled. Your booking is pending — you can retry payment.';
+              });
+            },
+            onError: (error: string) => {
+              this.ngZone.run(() => {
+                this.isSubmitting = false;
+                this.paymentError = 'Payment failed: ' + error;
+              });
+            },
+          }
+        );
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.paymentError = err?.error?.message || 'Failed to initiate payment. Please try again.';
       }
     });
   }

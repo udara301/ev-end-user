@@ -1,7 +1,7 @@
 {
 
   "/uploads": {
-    "target": "https://drivewithev.com",
+    "target": "https://travelwithev.com",
     "secure": false,
     "changeOrigin": true
   }

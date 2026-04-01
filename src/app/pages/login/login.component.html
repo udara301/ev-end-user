@@ -72,6 +72,17 @@
 				</button>
 			</form>
 
+			<div class="my-6 flex items-center gap-3">
+				<div class="h-px flex-1 bg-slate-200"></div>
+				<span class="text-xs font-medium uppercase tracking-wider text-slate-400">or</span>
+				<div class="h-px flex-1 bg-slate-200"></div>
+			</div>
+
+			<div class="flex justify-center">
+				<div id="google-signin-btn"></div>
+			</div>
+			<div *ngIf="isGoogleLoading" class="mt-3 text-center text-sm text-slate-500">Signing in with Google...</div>
+
 			<p class="mt-6 text-center text-sm text-slate-600">
 				New to TravelWithEV?
 				<a routerLink="/signup" class="font-bold text-tertiary hover:text-tertiary/80">Create an account</a>

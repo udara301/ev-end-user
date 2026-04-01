@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, NgZone, OnInit, AfterViewInit } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
+
+declare const google: any;
 
 export interface LoginPayload {
   email: string;
@@ -17,11 +20,12 @@ export interface LoginPayload {
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit {
   private readonly route = inject(ActivatedRoute);
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly ngZone = inject(NgZone);
 
   readonly registrationSuccessful = this.route.snapshot.queryParamMap.get('registered') === 'true';
   readonly sessionExpired = this.route.snapshot.queryParamMap.get('expired') === 'true';
@@ -35,6 +39,51 @@ export class LoginComponent {
 
   isSubmitting = false;
   apiError = '';
+  isGoogleLoading = false;
+
+  ngAfterViewInit(): void {
+    if (typeof google !== 'undefined') {
+      this.initializeGoogle();
+    } else {
+      // Wait for the GIS script to load
+      const interval = setInterval(() => {
+        if (typeof google !== 'undefined') {
+          clearInterval(interval);
+          this.initializeGoogle();
+        }
+      }, 100);
+    }
+  }
+
+  private initializeGoogle(): void {
+    google.accounts.id.initialize({
+      client_id: environment.googleClientId,
+      callback: (response: any) => this.handleGoogleLogin(response),
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('google-signin-btn'),
+      { theme: 'outline', size: 'large', width: '100%', text: 'signin_with', shape: 'pill' }
+    );
+  }
+
+  handleGoogleLogin(response: any): void {
+    this.ngZone.run(() => {
+      this.isGoogleLoading = true;
+      this.apiError = '';
+
+      this.authService.googleLogin(response.credential)
+        .pipe(finalize(() => this.isGoogleLoading = false))
+        .subscribe({
+          next: (res) => {
+            this.authService.setToken(res.token, false);
+            this.router.navigateByUrl(this.returnUrl ?? '/dashboard');
+          },
+          error: (error) => {
+            this.apiError = this.extractErrorMessage(error);
+          }
+        });
+    });
+  }
 
   get emailControl(): AbstractControl | null {
     return this.loginForm.get('email');

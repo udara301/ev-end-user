@@ -35,6 +35,11 @@ export class AuthService {
     }
 
 
+    googleLogin(idToken: string) {
+        return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/google-login/customer`, { idToken });
+    }
+
+
     setToken(token: string, isLocalStorage?: boolean) {
         if (isLocalStorage) {
             localStorage.setItem(this.tokenKey, token);

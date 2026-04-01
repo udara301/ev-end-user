@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { AfterViewInit, Component, inject, NgZone } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService, SignupPayload } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
+
+declare const google: any;
 
 function passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value;
@@ -23,10 +26,11 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
-export class SignupComponent {
+export class SignupComponent implements AfterViewInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly ngZone = inject(NgZone);
 
   readonly signupForm = this.formBuilder.group({
     fullName: ['', [Validators.required, Validators.minLength(3)]],
@@ -39,6 +43,50 @@ export class SignupComponent {
 
   isSubmitting = false;
   apiError = '';
+  isGoogleLoading = false;
+
+  ngAfterViewInit(): void {
+    if (typeof google !== 'undefined') {
+      this.initializeGoogle();
+    } else {
+      const interval = setInterval(() => {
+        if (typeof google !== 'undefined') {
+          clearInterval(interval);
+          this.initializeGoogle();
+        }
+      }, 100);
+    }
+  }
+
+  private initializeGoogle(): void {
+    google.accounts.id.initialize({
+      client_id: environment.googleClientId,
+      callback: (response: any) => this.handleGoogleSignup(response),
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('google-signup-btn'),
+      { theme: 'outline', size: 'large', width: '100%', text: 'signup_with', shape: 'pill' }
+    );
+  }
+
+  handleGoogleSignup(response: any): void {
+    this.ngZone.run(() => {
+      this.isGoogleLoading = true;
+      this.apiError = '';
+
+      this.authService.googleLogin(response.credential)
+        .pipe(finalize(() => this.isGoogleLoading = false))
+        .subscribe({
+          next: (res) => {
+            this.authService.setToken(res.token, false);
+            this.router.navigateByUrl('/dashboard');
+          },
+          error: (error) => {
+            this.apiError = this.extractErrorMessage(error);
+          }
+        });
+    });
+  }
 
   get fullNameControl(): AbstractControl | null {
     return this.signupForm.get('fullName');
