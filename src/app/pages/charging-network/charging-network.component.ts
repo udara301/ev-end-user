@@ -92,12 +92,12 @@ export class ChargingNetworkComponent implements OnInit {
         resolve();
         return;
       }
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => resolve();
-      document.head.appendChild(script);
+      // const script = document.createElement('script');
+      // script.src = `https://maps.googleapis.com/maps/api/js?key=${environment.googleMapsApiKey}`;
+      // script.async = true;
+      // script.defer = true;
+      // script.onload = () => resolve();
+      // document.head.appendChild(script);
     });
   }
 

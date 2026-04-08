@@ -35,4 +35,8 @@ export class BookingService {
         };
         return this.http.post(`${this.base}/place`, body);
     }
+
+    getUserBookings(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.base}/my-bookings`);
+    }
 }

@@ -39,6 +39,13 @@ export class AuthService {
         return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/google-login/customer`, { idToken });
     }
 
+    getProfile() {
+        return this.http.get(`${environment.apiUrl}/auth/me`);
+    }
+    
+    updateCustomerProfile(profileData: any) {
+        return this.http.put(`${environment.apiUrl}/auth/me`, profileData);
+    }
 
     setToken(token: string, isLocalStorage?: boolean) {
         if (isLocalStorage) {
@@ -65,6 +72,7 @@ export class AuthService {
         if (!token) return null;
         return jwtDecode<any>(token);
     }
+
 
 
     isLoggedIn() {
