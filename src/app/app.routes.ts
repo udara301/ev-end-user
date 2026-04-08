@@ -15,4 +15,5 @@ export const routes: Routes = [
     { path: 'search', component: SearchComponent },
     { path: 'booking-summary', component: BookingSummaryComponent },
     { path: 'charging-stations', component: ChargingNetworkComponent },
+    { path: '**', redirectTo: '' }
 ];

@@ -11,6 +11,60 @@
       <p class="text-lg text-slate-600">Find public EV charging stations across the island.</p>
     </div>
 
+    <!-- Filters -->
+    <div class="mb-6 rounded-3xl border border-white/70 bg-white/90 p-5 shadow-xl shadow-slate-900/5 backdrop-blur-md">
+      <div class="flex flex-wrap items-end gap-4">
+        <!-- Search -->
+        <div class="flex-1 min-w-[200px]">
+          <label class="block text-xs font-medium text-slate-500 mb-1">Search</label>
+          <div class="relative">
+            <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+            <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()"
+              placeholder="Search by place name..."
+              class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-10 pr-3 text-sm text-slate-700 placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+          </div>
+        </div>
+
+        <!-- Network -->
+        <div class="min-w-[160px]">
+          <label class="block text-xs font-medium text-slate-500 mb-1">Network</label>
+          <select [(ngModel)]="selectedNetwork" (ngModelChange)="applyFilters()"
+            class="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm text-slate-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="">All Networks</option>
+            <option *ngFor="let network of availableNetworks" [value]="network">{{ network }}</option>
+          </select>
+        </div>
+
+        <!-- Connector Type -->
+        <div class="min-w-[180px]">
+          <label class="block text-xs font-medium text-slate-500 mb-1">Connector Type</label>
+          <select [(ngModel)]="selectedConnectorType" (ngModelChange)="applyFilters()"
+            class="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm text-slate-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="">All Types</option>
+            <option *ngFor="let type of availableConnectorTypes" [value]="type">{{ type }}</option>
+          </select>
+        </div>
+
+        <!-- Verification -->
+        <div class="min-w-[150px]">
+          <label class="block text-xs font-medium text-slate-500 mb-1">Status</label>
+          <select [(ngModel)]="selectedVerification" (ngModelChange)="applyFilters()"
+            class="w-full rounded-xl border border-slate-200 bg-white py-2 px-3 text-sm text-slate-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="">All</option>
+            <option value="verified">Verified</option>
+            <option value="unverified">Unverified</option>
+          </select>
+        </div>
+
+        <!-- Clear -->
+        <button (click)="clearFilters()"
+          class="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
+          <span class="material-icons text-base">filter_alt_off</span>
+          Clear
+        </button>
+      </div>
+    </div>
+
     <div class="grid gap-6 lg:grid-cols-3">
       <!-- Map -->
       <div class="lg:col-span-2">
@@ -26,7 +80,7 @@
             [options]="mapOptions">
 
             <map-marker
-              *ngFor="let charger of chargers"
+              *ngFor="let charger of filteredChargers"
               #markerRef="mapMarker"
               [position]="getPosition(charger)"
               [options]="markerOptions"
@@ -38,8 +92,11 @@
                 <h3 class="text-base font-bold text-slate-900 mb-1">{{ selectedCharger.place_name }}</h3>
                 <p *ngIf="selectedCharger.description" class="text-sm text-slate-500 mb-2">{{ selectedCharger.description }}</p>
                 <div class="flex flex-wrap items-center gap-2 mb-2">
-                  <span class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-700">
-                    {{ selectedCharger.connector_type }}
+                  <span *ngIf="selectedCharger.charger_network" class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                    {{ selectedCharger.charger_network }}
+                  </span>
+                  <span *ngFor="let connector of selectedCharger.connectors" class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-700">
+                    {{ connector.connector_type }} · {{ connector.charger_capacity }} kW
                   </span>
                   <span *ngIf="selectedCharger.is_verified" class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700">
                     Verified
@@ -59,14 +116,14 @@
       <div class="space-y-4">
         <div class="rounded-3xl border border-white/70 bg-white/90 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-md">
           <h2 class="text-xl font-bold text-slate-900 mb-1">Stations</h2>
-          <p class="text-sm text-slate-500 mb-4">{{ chargers.length }} charging station{{ chargers.length !== 1 ? 's' : '' }} found</p>
+          <p class="text-sm text-slate-500 mb-4">{{ filteredChargers.length }} charging station{{ filteredChargers.length !== 1 ? 's' : '' }} found</p>
 
           <div *ngIf="isLoading" class="flex items-center justify-center py-12">
             <span class="material-icons animate-pulse text-4xl text-primary">ev_station</span>
           </div>
 
           <div *ngIf="!isLoading" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-            <div *ngFor="let charger of chargers"
+            <div *ngFor="let charger of filteredChargers"
               (click)="selectCharger(charger)"
               class="cursor-pointer rounded-2xl border p-4 transition hover:shadow-md"
               [ngClass]="selectedCharger?.id === charger.id 
@@ -83,8 +140,11 @@
                   <p *ngIf="charger.description" class="text-xs text-slate-500 mt-0.5 truncate">{{ charger.description }}</p>
                   
                   <div class="flex flex-wrap items-center gap-2 mt-2">
-                    <span class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-700">
-                      {{ charger.connector_type }}
+                    <span *ngIf="charger.charger_network" class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                      {{ charger.charger_network }}
+                    </span>
+                    <span *ngFor="let connector of charger.connectors" class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-semibold text-sky-700">
+                      {{ connector.connector_type }} · {{ connector.charger_capacity }} kW
                     </span>
                     <span *ngIf="charger.is_verified" class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700">
                       <span class="material-icons text-xs mr-0.5">verified</span> Verified
@@ -99,7 +159,7 @@
               </div>
             </div>
 
-            <div *ngIf="chargers.length === 0" class="py-8 text-center">
+            <div *ngIf="filteredChargers.length === 0" class="py-8 text-center">
               <span class="material-icons text-4xl text-slate-300">search_off</span>
               <p class="mt-2 text-sm text-slate-500">No charging stations found.</p>
             </div>
