@@ -169,4 +169,11 @@ export class ChargingNetworkComponent implements OnInit {
       this.mapZoom = 14;
     }
   }
+
+  openDirections(charger: PublicCharger): void {
+    const lat = charger.latitude;
+    const lng = charger.longitude;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+    window.open(url, '_blank');
+  }
 }
