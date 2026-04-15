@@ -5,19 +5,8 @@
     <p class="mt-2 text-4xl font-black">Rs {{ balance | number }}</p>
 
     <div class="mt-5 grid grid-cols-2 gap-3">
-      <div class="rounded-xl bg-white/10 p-3">
-        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Charge Credits</p>
-        <p class="mt-1 text-lg font-bold text-cyan-300">{{ chargeCredits }} kWh</p>
-      </div>
-      <div class="rounded-xl bg-white/10 p-3">
-        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">This Month</p>
-        <p class="mt-1 text-lg font-bold text-emerald-300">Rs 0</p>
-      </div>
-    </div>
-
-    <!-- Quick Actions (inside balance card on desktop) -->
-    <div class="mt-5 grid grid-cols-2 gap-3">
-      <button class="flex flex-col items-center gap-2 rounded-xl bg-white/10 p-3 transition hover:bg-white/20">
+      <button (click)="openTopup()"
+        class="flex flex-col items-center gap-2 rounded-xl bg-white/10 p-3 transition hover:bg-white/20">
         <span class="material-icons text-lg text-emerald-300">add</span>
         <span class="text-xs font-bold">Top Up</span>
       </button>
@@ -40,17 +29,28 @@
       <div *ngFor="let tx of transactions"
         class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-          [ngClass]="tx.type === 'credit' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-500'">
-          <span class="material-icons text-lg">{{ tx.icon }}</span>
+          [ngClass]="getTxType(tx.type) === 'credit' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-500'">
+          <span class="material-icons text-lg">{{ getTxIcon(tx.type) }}</span>
         </span>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-bold text-slate-900 truncate">{{ tx.title }}</p>
-          <p class="text-xs text-slate-400">{{ tx.date }}</p>
+          <p class="text-sm font-bold text-slate-900 truncate">{{ tx.description }}</p>
+          <p class="text-xs text-slate-400">{{ tx.created_at | date: 'MMM d, y · h:mm a' }}</p>
+          <p *ngIf="tx.reference_id" class="text-[10px] text-slate-300">Ref: {{ tx.reference_id }}</p>
         </div>
-        <p class="shrink-0 text-sm font-bold"
-          [ngClass]="tx.type === 'credit' ? 'text-emerald-600' : 'text-red-500'">
-          {{ tx.type === 'credit' ? '+' : '-' }} Rs {{ tx.amount | number }}
-        </p>
+        <div class="shrink-0 text-right">
+          <p class="text-sm font-bold"
+            [ngClass]="getTxType(tx.type) === 'credit' ? 'text-emerald-600' : 'text-red-500'">
+            {{ getTxType(tx.type) === 'credit' ? '+' : '-' }} Rs {{ tx.amount | number }}
+          </p>
+          <span class="inline-block mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase"
+            [ngClass]="{
+              'bg-emerald-100 text-emerald-700': tx.status === 'completed',
+              'bg-amber-100 text-amber-700': tx.status === 'pending',
+              'bg-red-100 text-red-600': tx.status === 'failed'
+            }">
+            {{ tx.status }}
+          </span>
+        </div>
       </div>
 
       <!-- Empty State -->
@@ -59,5 +59,56 @@
         <p class="mt-3 text-sm font-medium text-slate-400">No transactions yet</p>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Top-up Modal -->
+<div *ngIf="showTopupModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+  (click)="closeTopup()">
+  <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" (click)="$event.stopPropagation()">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-bold text-slate-900">Top Up Wallet</h3>
+      <button (click)="closeTopup()" class="text-slate-400 hover:text-slate-600">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <!-- Quick Amounts -->
+    <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Quick Select</p>
+    <div class="grid grid-cols-4 gap-2 mb-4">
+      <button *ngFor="let amt of quickAmounts"
+        (click)="selectQuickAmount(amt)"
+        class="rounded-xl border-2 p-2 text-sm font-bold transition"
+        [ngClass]="topupAmount === amt
+          ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+          : 'border-slate-200 text-slate-600 hover:border-slate-300'">
+        Rs {{ amt | number }}
+      </button>
+    </div>
+
+    <!-- Custom Amount -->
+    <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Or enter amount</label>
+    <div class="relative mb-4">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rs</span>
+      <input type="number" [(ngModel)]="topupAmount" min="100" placeholder="0"
+        class="w-full rounded-xl border-2 border-slate-200 py-3 pl-10 pr-4 text-lg font-bold text-slate-900 outline-none transition focus:border-emerald-500" />
+    </div>
+
+    <!-- Error -->
+    <p *ngIf="topupError" class="mb-3 rounded-lg bg-red-50 p-2 text-xs font-medium text-red-600">
+      {{ topupError }}
+    </p>
+
+    <!-- Confirm -->
+    <button (click)="confirmTopup()"
+      [disabled]="isTopupProcessing || !topupAmount"
+      class="w-full rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed">
+      <span *ngIf="!isTopupProcessing">Top Up Rs {{ (topupAmount || 0) | number }}</span>
+      <span *ngIf="isTopupProcessing" class="flex items-center justify-center gap-2">
+        <span class="material-icons animate-spin text-base">sync</span>
+        Processing…
+      </span>
+    </button>
   </div>
 </div>
