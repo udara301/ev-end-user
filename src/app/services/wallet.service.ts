@@ -73,6 +73,9 @@ export class WalletService {
         const payment = {
             sandbox: true,
             merchant_id: topupData.merchant_id,
+            return_url: `${environment.apiUrl}/wallet/topup/return`,
+            cancel_url: `${environment.apiUrl}/wallet/topup/cancel`,
+            notify_url: `${environment.apiUrl}/wallet/topup/notify`,
             order_id: topupData.order_id,
             items: 'Wallet Top-up',
             amount: Number(topupData.amount).toFixed(2),
@@ -85,7 +88,6 @@ export class WalletService {
             address: user.address,
             city: user.city,
             country: user.country,
-            notify_url: `${environment.apiUrl}/wallet/topup/notify`,
         };
 
         console.log('Starting PayHere payment with data:', payment);
