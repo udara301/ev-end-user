@@ -146,8 +146,8 @@ export class BookingSummaryComponent implements OnInit {
         const payment = {
             "sandbox": true,
             "merchant_id": environment.payhereMerchantId,
-            "return_url": "https://travelwithev.com/api/v1/payments/success", // පේමන්ට් එක සාර්ථක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
-            "cancel_url": "https://travelwithev.com/api/v1/payments/cancel",
+            "return_url": "https://travelwithev.com/booking-success", // පේමන්ට් එක සාර්ථක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
+            "cancel_url": "https://travelwithev.com/booking-cancel",
             "notify_url": "https://travelwithev.com/api/v1/payments/notify", // පේමන්ට් එක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
             "order_id": orderId.toString(),
             "items": `${this.bookingData.vehicle.brand} ${this.bookingData.vehicle.model_name} Rental`,
@@ -184,21 +184,40 @@ export class BookingSummaryComponent implements OnInit {
             onCompleted: (completedOrderId: string) => {
               this.ngZone.run(() => {
                 this.isSubmitting = false;
+                const successState = {
+                  orderId: orderId,
+                  vehicleName: `${this.bookingData.vehicle.brand} ${this.bookingData.vehicle.model_name}`,
+                  pickupLocation: this.bookingData.pickupLocation,
+                  dropoffLocation: this.bookingData.dropoffLocation,
+                  pickupDate: this.bookingData.pickupDate,
+                  dropoffDate: this.bookingData.dropoffDate,
+                  totalCost: this.totalCost,
+                };
                 this.localStorageService.clearSearchCriteria();
                 this.localStorageService.clearSelectedVehicle();
-                this.router.navigate(['/dashboard']);
+                this.router.navigate(['/booking-success'], { state: successState });
               });
             },
             onDismissed: () => {
               this.ngZone.run(() => {
                 this.isSubmitting = false;
-                this.paymentError = 'Payment was cancelled. Your booking is pending — you can retry payment.';
+                this.router.navigate(['/booking-cancel'], {
+                  state: {
+                    orderId: orderId,
+                    errorMessage: 'Payment was cancelled. Your booking is pending — you can retry payment.',
+                  }
+                });
               });
             },
             onError: (error: string) => {
               this.ngZone.run(() => {
                 this.isSubmitting = false;
-                this.paymentError = 'Payment failed: ' + error;
+                this.router.navigate(['/booking-cancel'], {
+                  state: {
+                    orderId: orderId,
+                    errorMessage: 'Payment failed: ' + error,
+                  }
+                });
               });
             },
           }
