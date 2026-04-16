@@ -26,6 +26,12 @@
     <span class="material-icons animate-spin text-3xl text-primary">sync</span>
   </div>
 
+  <!-- Payment Error -->
+  <div *ngIf="paymentError" class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 flex items-start gap-2">
+    <span class="material-icons text-base mt-0.5">error</span>
+    {{ paymentError }}
+  </div>
+
   <!-- Booking Cards -->
   <div *ngIf="!isLoading" class="space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
     <div *ngFor="let booking of filteredBookings"
@@ -52,6 +58,16 @@
         <div class="text-right shrink-0">
           <p class="text-lg font-black text-slate-900">Rs {{ booking.total_price | number }}</p>
         </div>
+      </div>
+
+      <!-- Pay Now for pending bookings -->
+      <div *ngIf="booking.booking_status.toLowerCase() === 'pending'" class="mt-3 pt-3 border-t border-slate-100">
+        <button (click)="retryPayment(booking)"
+          [disabled]="payingBookingId === booking.booking_id"
+          class="w-full rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          <span *ngIf="payingBookingId === booking.booking_id" class="material-icons text-sm animate-spin">sync</span>
+          {{ payingBookingId === booking.booking_id ? 'Processing...' : 'Pay Now' }}
+        </button>
       </div>
     </div>
 

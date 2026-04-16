@@ -135,6 +135,22 @@ export class BookingSummaryComponent implements OnInit {
     const amount = this.totalCost;
     const currency = 'LKR';
 
+    this.paymentService.initiatePayment({
+      booking_id: orderId,
+      amount,
+      method: 'payhere',
+    }).subscribe({
+      next: () => {
+        this.processPayhere(orderId, amount, currency);
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.paymentError = err?.error?.message || 'Failed to initiate payment. Please try again.';
+      }
+    });
+  }
+
+  private processPayhere(orderId: string, amount: number, currency: string): void {
     this.paymentService.getPaymentHash({ order_id: orderId, amount, currency }).subscribe({
       next: (hashRes) => {
         const user = this.authService.getUserFromToken();
@@ -163,21 +179,7 @@ export class BookingSummaryComponent implements OnInit {
             "country": "Sri Lanka",
         };
 
-        //  {
-        //     merchant_id: environment.payhereMerchantId,
-        //     order_id: orderId,
-        //     items: `${this.bookingData.vehicle.brand} ${this.bookingData.vehicle.model_name} Rental`,
-        //     amount,
-        //     currency,
-        //     hash: hashRes.hash,
-        //     first_name: firstName,
-        //     last_name: lastName,
-        //     email: user?.email || '',
-        //     phone: user?.phone || '',
-        //     address: '-',
-        //     city: 'Colombo',
-        //     country: 'Sri Lanka',
-        //   }
+
         this.paymentService.startPayment(
          payment,
           {
@@ -225,7 +227,7 @@ export class BookingSummaryComponent implements OnInit {
       },
       error: (err) => {
         this.isSubmitting = false;
-        this.paymentError = err?.error?.message || 'Failed to initiate payment. Please try again.';
+        this.paymentError = err?.error?.message || 'Failed to process payment. Please try again.';
       }
     });
   }

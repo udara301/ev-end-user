@@ -26,6 +26,10 @@ export class PaymentService {
         return this.http.post<PaymentHashResponse>(`${this.base}/hash`, data);
     }
 
+    initiatePayment(data: { booking_id: number | string; amount: number; method: string }): Observable<{ message: string; paymentId: number }> {
+        return this.http.post<{ message: string; paymentId: number }>(`${this.base}/initiate`, data);
+    }
+
     startPayment(
         paymentData: {
             merchant_id: string;

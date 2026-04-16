@@ -39,4 +39,8 @@ export class BookingService {
     getUserBookings(): Observable<any[]> {
         return this.http.get<any[]>(`${this.base}/my-bookings`);
     }
+
+    getBookingById(bookingId: number): Observable<any> {
+        return this.http.get<any>(`${this.base}/${bookingId}`);
+    }
 }
