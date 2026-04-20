@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { BookingsTabComponent } from './bookings-tab/bookings-tab.component';
 import { ChargerControlsTabComponent } from './charger-controls-tab/charger-controls-tab.component';
@@ -38,9 +39,14 @@ export class DashboardComponent implements OnInit {
     { id: 'profile', label: 'Profile', icon: 'person' }
   ];
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab && this.tabs.some(t => t.id === tab)) {
+      this.activeTab = tab as TabId;
+    }
+
     const userData = this.authService.getProfile().subscribe(
       (data:any) => {
         this.userName = data?.name || 'there';

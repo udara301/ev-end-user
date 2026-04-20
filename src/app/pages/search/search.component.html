@@ -143,9 +143,9 @@
                         <select [(ngModel)]="selectedPriceBand"
                             class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-slate-800 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30">
                             <option value="all">Any Budget</option>
-                            <option value="budget">Budget (under $ 80)</option>
-                            <option value="mid">Mid ($ 80 - 150)</option>
-                            <option value="premium">Premium ($ 150+)</option>
+                            <option value="budget">Budget (under Rs: 80)</option>
+                            <option value="mid">Mid (Rs: 80 - 150)</option>
+                            <option value="premium">Premium (Rs: 150+)</option>
                         </select>
                     </div>
 
@@ -207,7 +207,7 @@
                                     <p class="text-sm text-slate-500">{{ vehicle.brand }}</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-xl font-extrabold text-primary">$ {{ vehicle.base_price_per_day |
+                                    <p class="text-xl font-extrabold text-primary">Rs: {{ vehicle.base_price_per_day |
                                         number }}</p>
                                     <p class="text-xs text-slate-500">/ day</p>
                                 </div>

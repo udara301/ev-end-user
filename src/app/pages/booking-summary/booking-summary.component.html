@@ -188,12 +188,12 @@
 
           <div class="space-y-4 border-b border-slate-200 pb-6">
             <div class="flex items-center justify-between">
-              <span class="text-slate-600">Base price ({{ bookingData.rentalDays }} days × $ {{ bookingData.vehicle.base_price_per_day | number }})</span>
-              <span class="font-bold text-slate-900">$ {{ subtotal | number }}</span>
+              <span class="text-slate-600">Base price ({{ bookingData.rentalDays }} days × Rs: {{ bookingData.vehicle.base_price_per_day | number }})</span>
+              <span class="font-bold text-slate-900">Rs: {{ subtotal | number }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-slate-600">Pickup-Return cost</span>
-              <span class="font-bold text-slate-900">$ {{ pickupReturnCost | number }}</span>
+              <span class="font-bold text-slate-900">Rs: {{ pickupReturnCost | number }}</span>
             </div>
           </div>
 
@@ -204,14 +204,14 @@
                 <span class="text-slate-600">Refundable Deposit</span>
                 <p class="text-xs text-slate-400 mt-0.5">Returned after vehicle inspection</p>
               </div>
-              <span class="font-bold text-amber-600">$ {{ bookingData.vehicle.deposit | number }}</span>
+              <span class="font-bold text-amber-600">Rs: {{ bookingData.vehicle.deposit | number }}</span>
             </div>
           </div>
 
           <div class="pt-6">
             <div class="flex items-center justify-between mb-6">
               <span class="text-lg font-bold text-slate-900">Total Cost</span>
-              <span class="text-3xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">$ {{ totalCost | number }}</span>
+              <span class="text-3xl font-black bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Rs: {{ totalCost | number }}</span>
             </div>
           </div>
         </div>

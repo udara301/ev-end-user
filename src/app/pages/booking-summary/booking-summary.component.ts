@@ -6,6 +6,7 @@ import { LocationService } from '../../services/location.service';
 import { LocalStorageService } from '../../services/localStorage.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { BookingService } from '../../services/booking.service';
+import { ToastService } from '../../services/toast.service';
 import { PaymentService } from '../../services/payment.service';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
@@ -54,6 +55,7 @@ export class BookingSummaryComponent implements OnInit {
   private readonly paymentService = inject(PaymentService);
   private readonly authService = inject(AuthService);
   private readonly ngZone = inject(NgZone);
+  private readonly toast = inject(ToastService);
 
   bookingData: BookingSummaryData = null as any;
   paymentError = '';
@@ -96,11 +98,11 @@ export class BookingSummaryComponent implements OnInit {
 
   confirmBooking(): void {
     if (!this.acceptTerms) {
-      alert('Please accept the terms and conditions to proceed.');
+      this.toast.warning('Please accept the terms and conditions to proceed.');
       return;
     }
     if (!this.pickupTime || !this.dropoffTime) {
-      alert('Please select both pickup and dropoff times.');
+      this.toast.warning('Please select both pickup and dropoff times.');
       return;
     }
 

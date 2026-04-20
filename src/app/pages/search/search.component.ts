@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LocationService } from '../../services/location.service';
 import { LocalStorageService } from '../../services/localStorage.service';
+import { ToastService } from '../../services/toast.service';
 import flatpickr from 'flatpickr';
 import { AfterViewInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
@@ -58,7 +59,7 @@ export class SearchComponent implements AfterViewInit {
   selectedDropoffDate: string = '';
   vehicles: SearchVehicle[] = [];
 
-  constructor(private locationService: LocationService, private bookingService: BookingService) { }
+  constructor(private locationService: LocationService, private bookingService: BookingService, private toast: ToastService) { }
 
   ngOnInit(): void {
     this.locationService.getLocations().subscribe((locations: any) => {
@@ -69,13 +70,27 @@ export class SearchComponent implements AfterViewInit {
     this.loadSearchCriteria();
   }
 
+  private pickupFp: any;
+  private returnFp: any;
+
   ngAfterViewInit(): void {
-    flatpickr('#pickupDate', {
+    this.pickupFp = flatpickr('#pickupDate', {
       minDate: "today",
-      dateFormat: "Y-m-d"
+      dateFormat: "Y-m-d",
+      onChange: (selectedDates: Date[]) => {
+        if (selectedDates.length > 0) {
+          const nextDay = new Date(selectedDates[0]);
+          nextDay.setDate(nextDay.getDate() + 1);
+          this.returnFp.set('minDate', nextDay);
+          if (this.selectedDropoffDate && new Date(this.selectedDropoffDate) <= selectedDates[0]) {
+            this.selectedDropoffDate = '';
+            this.returnFp.clear();
+          }
+        }
+      }
     });
 
-    flatpickr('#returnDate', {
+    this.returnFp = flatpickr('#returnDate', {
       minDate: "today",
       dateFormat: "Y-m-d"
     });
@@ -98,7 +113,7 @@ export class SearchComponent implements AfterViewInit {
 
   searchVehicles(): void {
     if (!this.selectedPickupLocation || !this.selectedDropoffLocation || !this.selectedPickupDate || !this.selectedDropoffDate) {
-      alert('Please fill in all search fields.');
+      this.toast.warning('Please fill in all search fields.');
       return;
     }
 

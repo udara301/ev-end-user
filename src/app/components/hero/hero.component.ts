@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { LocationService } from '../../services/location.service';
 import { LocalStorageService } from '../../services/localStorage.service';
+import { ToastService } from '../../services/toast.service';
 import { CommonModule } from '@angular/common';
 import flatpickr from 'flatpickr';
 import { AfterViewInit } from '@angular/core';
@@ -26,15 +27,29 @@ export class HeroComponent implements AfterViewInit{
   selectedDropoffDate: string = '';
   selectedCategory: string = 'all';
 
-  constructor(private locationService: LocationService) { }
+  constructor(private locationService: LocationService, private toast: ToastService) { }
+
+  private pickupFp: any;
+  private dropoffFp: any;
 
   ngAfterViewInit(): void {
-    flatpickr('#pickupDate', {
+    this.pickupFp = flatpickr('#pickupDate', {
       minDate: "today",
-      dateFormat: "Y-m-d"
+      dateFormat: "Y-m-d",
+      onChange: (selectedDates: Date[]) => {
+        if (selectedDates.length > 0) {
+          const nextDay = new Date(selectedDates[0]);
+          nextDay.setDate(nextDay.getDate() + 1);
+          this.dropoffFp.set('minDate', nextDay);
+          if (this.selectedDropoffDate && new Date(this.selectedDropoffDate) <= selectedDates[0]) {
+            this.selectedDropoffDate = '';
+            this.dropoffFp.clear();
+          }
+        }
+      }
     });
 
-    flatpickr('#dropoffDate', {
+    this.dropoffFp = flatpickr('#dropoffDate', {
       minDate: "today",
       dateFormat: "Y-m-d"
     });
@@ -50,7 +65,7 @@ export class HeroComponent implements AfterViewInit{
   findEV(): void {
     
     if (!this.selectedPickupLocation || !this.selectedDropoffLocation || !this.selectedPickupDate || !this.selectedDropoffDate) {
-      alert('Please fill in all search fields.');
+      this.toast.warning('Please fill in all search fields.');
       return;
     }
 
