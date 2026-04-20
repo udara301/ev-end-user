@@ -1,3 +1,4 @@
+
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 import { SignupComponent } from './pages/signup/signup.component';
@@ -9,11 +10,14 @@ import { BookingCancelComponent } from './pages/booking-cancel/booking-cancel.co
 import { AuthGuard } from './guards/auth.guard';
 import { ChargingNetworkComponent } from './pages/charging-network/charging-network.component';
 import { QuickSearchComponent } from './pages/quick-search/quick-search.component';
+import { TermsComponent } from './pages/legal/terms.component';
+import { PrivacyPolicyComponent } from './pages/legal/privacy-policy.component';
+import { ReturnPolicyComponent } from './pages/legal/return-policy.component';
 
 export const routes: Routes = [
     { path: '', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
-	{ path: 'login', component: LoginComponent },
-	{ path: 'signup', component: SignupComponent },
+    { path: 'login', component: LoginComponent },
+    { path: 'signup', component: SignupComponent },
     { path: 'dashboard', canActivate: [AuthGuard], component: DashboardComponent },
     { path: 'search', component: SearchComponent },
     { path: 'booking-summary', component: BookingSummaryComponent },
@@ -21,5 +25,8 @@ export const routes: Routes = [
     { path: 'booking-cancel', component: BookingCancelComponent },
     { path: 'charging-stations', component: ChargingNetworkComponent },
     { path: 'quick-search/:ocppId', component: QuickSearchComponent },
+    { path: 'terms', component: TermsComponent },
+    { path: 'privacy-policy', component: PrivacyPolicyComponent },
+    { path: 'return-policy', component: ReturnPolicyComponent },
     { path: '**', redirectTo: '' }
 ];
