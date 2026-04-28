@@ -1,0 +1,126 @@
+.blog-section {
+  max-width: 1200px;
+  margin: 3.5rem auto 0 auto;
+  padding: 0 1rem 3rem 1rem;
+  text-align: center;
+}
+
+.blog-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #223057;
+  margin-bottom: 2.5rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.blog-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.blog-card {
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 16px 0 rgba(34, 48, 87, 0.06);
+  overflow: hidden;
+  max-width: 350px;
+  min-width: 260px;
+  flex: 1 1 320px;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
+  text-align: left;
+}
+
+.blog-card:hover {
+  box-shadow: 0 4px 24px 0 rgba(34, 48, 87, 0.13);
+}
+
+.blog-image img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-top-left-radius: 1.25rem;
+  border-top-right-radius: 1.25rem;
+  background: #f2f4f8;
+}
+
+.blog-content {
+  padding: 1.5rem 1.3rem 1.2rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.blog-tag {
+  display: inline-block;
+  background: #f7fafd;
+  color: #223057;
+  border-radius: 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.3rem 1.1rem;
+  margin-bottom: 0.7rem;
+}
+
+.blog-content h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #223057;
+  margin-bottom: 0.3rem;
+}
+
+.blog-content p {
+  color: #5c6a82;
+  font-size: 1.05rem;
+  margin-bottom: 0.7rem;
+}
+
+.blog-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.98rem;
+  color: #5c6a82;
+  margin-top: 0.7rem;
+}
+
+.blog-link {
+  color: #1ca672;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.blog-link:hover {
+  color: #2e8b57;
+}
+
+.blog-footer {
+  margin-top: 2.5rem;
+}
+
+.view-all {
+  color: #223057;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+
+.view-all:hover {
+  color: #1ca672;
+}
+
+@media (max-width: 900px) {
+  .blog-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .blog-card {
+    max-width: 500px;
+    width: 100%;
+  }
+}

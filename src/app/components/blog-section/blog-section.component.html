@@ -1,0 +1,22 @@
+<section class="blog-section">
+  <h2 class="blog-title">From the road</h2>
+  <div class="blog-cards">
+    <div class="blog-card" *ngFor="let blog of blogs">
+      <div class="blog-image">
+        <img [src]="blog.image" [alt]="blog.title" />
+      </div>
+      <div class="blog-content">
+        <span class="blog-tag">{{ blog.tag }}</span>
+        <h3>{{ blog.title }}</h3>
+        <p>{{ blog.desc }}</p>
+        <div class="blog-meta">
+          <span>{{ blog.readTime }}</span>
+          <a class="blog-link" [routerLink]="blog.link">Read more &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="blog-footer">
+    <a href="#" class="view-all">View all posts &rarr;</a>
+  </div>
+</section>

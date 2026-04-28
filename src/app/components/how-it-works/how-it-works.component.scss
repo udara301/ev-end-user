@@ -1,0 +1,93 @@
+
+.how-it-works {
+  background: #f7fafd;
+  border-radius: 1.5rem;
+  max-width: 1100px;
+  margin: 2.5rem auto 3rem auto;
+  padding: 3rem 1.5rem 2rem 1.5rem;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+}
+
+.how-it-works h2 {
+  font-size: 2.3rem;
+  font-weight: 700;
+  color: #223057;
+  margin-bottom: 0.7rem;
+}
+
+.how-it-works .subtitle {
+  color: #5c6a82;
+  font-size: 1.15rem;
+  margin-bottom: 2.5rem;
+}
+
+.how-it-works .steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.how-it-works .step {
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 16px 0 rgba(34, 48, 87, 0.06);
+  padding: 2.5rem 2rem 2rem 2rem;
+  flex: 1 1 220px;
+  max-width: 260px;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+  text-align: center;
+}
+
+.how-it-works .step:hover {
+  box-shadow: 0 4px 24px 0 rgba(34, 48, 87, 0.13);
+}
+
+.how-it-works .circle {
+  background: #eafbee;
+  color: #3cb371;
+  font-weight: 700;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 0.7rem;
+  margin-top: 0;
+  border: 1.5px solid #3cb371;
+}
+
+.how-it-works .icon {
+  font-size: 2.1rem;
+  margin-bottom: 1.1rem;
+}
+
+.how-it-works .step-title {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #223057;
+  margin-bottom: 0.3rem;
+}
+
+.how-it-works .step-desc {
+  color: #5c6a82;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 900px) {
+  .how-it-works .steps {
+    flex-direction: column;
+    align-items: center;
+  }
+  .how-it-works .step {
+    max-width: 400px;
+    width: 100%;
+  }
+}

@@ -143,9 +143,9 @@ export class SearchComponent implements AfterViewInit {
       // const fastChargeMatch = !this.onlyFastCharge || vehicle.fastCharge;
       const priceBandMatch =
         this.selectedPriceBand === 'all' ||
-        (this.selectedPriceBand === 'budget' && vehicle.base_price_per_day < 80) ||
-        (this.selectedPriceBand === 'mid' && vehicle.base_price_per_day >= 80 && vehicle.base_price_per_day < 150) ||
-        (this.selectedPriceBand === 'premium' && vehicle.base_price_per_day >= 150);
+        (this.selectedPriceBand === 'budget' && vehicle.base_price_per_day < 8000) ||
+        (this.selectedPriceBand === 'mid' && vehicle.base_price_per_day >= 8000 && vehicle.base_price_per_day < 15000) ||
+        (this.selectedPriceBand === 'premium' && vehicle.base_price_per_day >= 15000);
 
       // return categoryMatch && transmissionMatch && fastChargeMatch && priceBandMatch;
       return categoryMatch && priceBandMatch;

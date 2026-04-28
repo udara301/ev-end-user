@@ -130,14 +130,19 @@ export class WalletTabComponent implements OnInit {
 
   getTxIcon(type: string): string {
     switch (type) {
-      case 'topup': return 'add_circle';
-      case 'payment': return 'shopping_cart';
-      case 'refund': return 'replay';
+      case 'TOPUP': return 'add_circle';
+      case 'PAYMENT': return 'shopping_cart';
+      case 'REFUND': return 'replay';
       default: return 'swap_horiz';
     }
   }
 
-  getTxType(type: string): 'credit' | 'debit' {
-    return type === 'topup' || type === 'refund' ? 'credit' : 'debit';
+  getTxType(type: string): 'TOPUP' | 'PENDING' | 'PAYMENT' | 'OTHER' {
+    switch (type) {
+      case 'COMPLETED': return 'TOPUP';
+      case 'PENDING': return 'PENDING';
+      case '': return 'PAYMENT';
+      default: return 'OTHER';
+    }
   }
 }
