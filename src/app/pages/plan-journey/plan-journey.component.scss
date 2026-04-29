@@ -1,0 +1,143 @@
+.plan-journey-container {
+  max-width: 600px;
+  margin: 3rem auto;
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 16px 0 rgba(34, 48, 87, 0.06);
+  padding: 2.5rem 2rem;
+  font-family: 'Inter', sans-serif;
+}
+.plan-journey-container {
+  max-width: 1100px;
+  margin: 3rem auto;
+  background: #fff;
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 16px 0 rgba(34, 48, 87, 0.06);
+  padding: 2.5rem 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.plan-journey-flex {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.plan-journey-form-side {
+  flex: 1 1 350px;
+  min-width: 320px;
+}
+
+.plan-journey-map-side {
+  flex: 2 1 500px;
+  min-width: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-placeholder {
+  width: 100%;
+  min-height: 420px;
+  background: #f7fafd;
+  border: 2px dashed #cbd5e1;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5c6a82;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .plan-journey-flex {
+    flex-direction: column;
+  }
+  .plan-journey-map-side {
+    min-width: unset;
+  }
+}
+
+.plan-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #223057;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.plan-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.plan-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.plan-form-group label {
+  font-weight: 500;
+  color: #223057;
+}
+
+.plan-form-group input,
+.plan-form-group select {
+  padding: 0.7rem 1rem;
+  border: 1px solid #e0e7ef;
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  background: #f7fafd;
+}
+
+.charging-points-list {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.plan-btn {
+  margin-top: 2rem;
+  padding: 0.9rem 1.5rem;
+  background: #1ca672;
+  color: #fff;
+  border: none;
+  border-radius: 0.7rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.plan-btn:hover {
+  background: #17895c;
+}
+
+.place-input {
+  display: block;
+  width: 100%;
+  min-width: 250px;
+}
+
+gmpx-place-autocomplete {
+  display: block;
+  width: 100%;
+}
+
+.add-charging-point-btn {
+  padding: 0.5rem 1rem;
+  background: #e0e7ef;
+  color: #223057;
+  border: none;
+  border-radius: 0.7rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-charging-point-btn:hover {
+  background: #cbd5e1;
+}

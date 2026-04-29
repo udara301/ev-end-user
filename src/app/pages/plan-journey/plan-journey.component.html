@@ -1,0 +1,51 @@
+<section class="plan-journey-container plan-journey-flex">
+  <div class="plan-journey-form-side">
+    <h2 class="plan-title">Plan Your Journey</h2>
+    <form class="plan-form">
+      <div class="plan-form-group">
+        <label for="vehicleType">Vehicle Type</label>
+        <input type="text" id="vehicleType" name="vehicleType" placeholder="e.g. Tesla Model 3" />
+      </div>
+      <div class="plan-form-group">
+        <label for="range">Range per Charge (km)</label>
+        <input type="number" id="range" name="range" placeholder="e.g. 250" />
+      </div>
+      <div class="plan-form-group">
+        <label for="start">Starting Point</label>
+        <input type="text" id="startInput" name="start" placeholder="Select on map or search..." />
+      </div>
+      <div class="plan-form-group">
+        <label for="end">Destination</label>
+        <input type="text" id="endInput" name="end" placeholder="Select on map or search..." />
+      </div>
+      <div class="plan-form-group">
+        <label for="distance">Distance</label>
+        <input type="text" id="distance" name="distance" placeholder="Distance will be shown here" [value]="distanceText" disabled />
+      </div>
+      <div class="plan-form-group">
+        <label>Choose Charging Points</label>
+        <div class="charging-points-list">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <select id="chargingPoints" name="chargingPoints">
+              <option *ngFor="let point of selectedChargingPoints">
+                {{ point.name }}
+              </option>
+            </select>
+            <div>
+              <button type="button" class="add-charging-point-btn">Add Charging Point</button>
+            </div>
+          </div>
+
+          <div class="charging-points-map-placeholder"
+            style="height:150px;width:100%;min-height:150px;margin-top:10px;background-color:#f0f0f0;display:flex;align-items:center;justify-content:center;">
+            <span style="color:#888;">Charging points map placeholder</span>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="plan-btn">Preview Route</button>
+    </form>
+  </div>
+  <div class="plan-journey-map-side">
+    <div #mapContainer class="map-placeholder" style="height:420px;width:100%;min-height:320px;"></div>
+  </div>
+</section>

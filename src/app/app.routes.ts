@@ -17,11 +17,14 @@ import { ReturnPolicyComponent } from './pages/legal/return-policy.component';
 
 // Standalone blog post view
 
+
+import { PlanJourneyComponent } from './pages/plan-journey/plan-journey.component';
 import { SingleBlogPostComponent } from './components/blog-section/single-blog-post.component';
 
 export const routes: Routes = [
     { path: '', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
     { path: 'blog/:id', component: SingleBlogPostComponent },
+    { path: 'plan-journey', component: PlanJourneyComponent },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
     { path: 'dashboard', canActivate: [AuthGuard], component: DashboardComponent },
