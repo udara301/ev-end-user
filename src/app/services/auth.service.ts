@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { jwtDecode } from 'jwt-decode';
+import { Observable } from 'rxjs';
 
 export interface SignupPayload {
     name: string;
@@ -39,6 +40,14 @@ export class AuthService {
         return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/google-login/customer`, { idToken });
     }
 
+    fogotPassword(email: string) {
+        return this.http.post(`${environment.apiUrl}/auth/forgot-password`, { email });
+    }
+
+     resetPassword(token: string, password: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/reset-password`, { token, password });
+  }
+  
     getProfile() {
         return this.http.get(`${environment.apiUrl}/auth/me`);
     }

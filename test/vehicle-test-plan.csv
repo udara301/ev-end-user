@@ -1,0 +1,8 @@
+Test Case,Description,Expected Result,Status (Pass/Fail),Comments
+Vehicle - Add Vehicle,User adds a new vehicle,Vehicle is added and listed,,
+Vehicle - Edit Vehicle,User edits vehicle details,Vehicle info is updated,,
+Vehicle - Delete Vehicle,User deletes a vehicle,Vehicle is removed from list,,
+Vehicle - View Vehicles,User views all vehicles,All vehicles are listed,,
+Vehicle - Invalid Add,User submits invalid vehicle data,Form validation error, no vehicle added,,
+Vehicle - Category Filter,User filters vehicles by category,Filtered vehicles are displayed,,
+Vehicle - Edge: Network Error,Network/server error during vehicle action,User sees generic error message,,

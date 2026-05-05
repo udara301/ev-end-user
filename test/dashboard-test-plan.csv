@@ -1,0 +1,11 @@
+Test Case,Description,Expected Result,Status (Pass/Fail),Comments
+Dashboard - View Dashboard,User logs in and views dashboard,Dashboard loads with user data,,
+Dashboard - View Bookings Tab,User navigates to bookings tab,Bookings are listed correctly,,
+Dashboard - View Wallet Tab,User navigates to wallet tab,Wallet info and transactions are shown,,
+Dashboard - View Profile Tab,User navigates to profile tab,Profile info is displayed,,
+Dashboard - Edit Profile,User edits and saves profile,Profile is updated and confirmation shown,,
+Dashboard - Edit Profile Invalid,User submits invalid profile data,Form validation error, no update,,
+Dashboard - Wallet Top-up,User tops up wallet,Wallet balance is updated,,
+Dashboard - Wallet History,User views wallet transaction history,All transactions are listed,,
+Dashboard - Logout,User logs out from dashboard,User is logged out and redirected to login,,
+Dashboard - Session Expiry,Session expires while on dashboard,User is logged out and redirected,,

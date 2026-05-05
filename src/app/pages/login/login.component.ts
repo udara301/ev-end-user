@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, NgZone, OnInit, AfterViewInit } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -31,11 +32,51 @@ export class LoginComponent implements AfterViewInit {
   readonly sessionExpired = this.route.snapshot.queryParamMap.get('expired') === 'true';
   private readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
 
+
   readonly loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
     rememberMe: [false]
   });
+
+  // Forgot password modal logic
+  showForgotPassword = false;
+  forgotForm: FormGroup = this.formBuilder.group({
+    email: ['', [Validators.required, Validators.email]]
+  });
+  forgotLoading = false;
+  forgotError: string | null = null;
+  forgotSuccess: string | null = null;
+  private readonly http = inject(HttpClient);
+  openForgotPassword(event: Event) {
+    event.preventDefault();
+    this.showForgotPassword = true;
+    this.forgotForm.reset();
+    this.forgotError = null;
+    this.forgotSuccess = null;
+  }
+
+  closeForgotPassword() {
+    this.showForgotPassword = false;
+  }
+
+  onForgotSubmit() {
+    if (this.forgotForm.invalid) return;
+    this.forgotLoading = true;
+    this.forgotError = null;
+    this.forgotSuccess = null;
+    const email = this.forgotForm.value.email;
+    this.authService.fogotPassword(email).subscribe({
+      next: (res: any) => {
+        this.forgotSuccess = res.message || 'Password reset link sent to your email.';
+        this.forgotLoading = false;
+      },
+      error: (err) => {
+        this.forgotError = err.error?.message || 'Something went wrong.';
+        this.forgotLoading = false;
+      }
+    });
+  }
 
   isSubmitting = false;
   apiError = '';

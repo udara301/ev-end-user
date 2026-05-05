@@ -1,0 +1,12 @@
+Test Case,Description,Expected Result,Status (Pass/Fail),Comments
+Booking - Valid Booking,User books with valid details,Booking is successful, confirmation shown,,
+Booking - Invalid Details,User books with invalid or incomplete details,Form validation error, no booking made,,
+Booking - Double Booking,User tries to book same slot twice,Error message displayed, booking fails,,
+Booking - Cancel Booking,User cancels a booking,Booking is cancelled, status updated,,
+Booking - View Summary,User views booking summary,Correct booking details are displayed,,
+Booking - Payment Success,User completes payment,Payment is processed, booking confirmed,,
+Booking - Payment Failure,Payment fails during booking,Error message displayed, booking not confirmed,,
+Booking - Booking Success Page,User is redirected to booking success page,Success message and details shown,,
+Booking - Booking Cancel Page,User is redirected to booking cancel page,Cancel message and details shown,,
+Booking - Booking History,User views booking history,All past bookings are listed,,
+Booking - Edge: Network Error,Network/server error during booking,User sees generic error message,,

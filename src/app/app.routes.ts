@@ -19,12 +19,14 @@ import { ReturnPolicyComponent } from './pages/legal/return-policy.component';
 
 
 import { PlanJourneyComponent } from './pages/plan-journey/plan-journey.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { SingleBlogPostComponent } from './components/blog-section/single-blog-post.component';
 
 export const routes: Routes = [
     { path: '', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
     { path: 'blog/:id', component: SingleBlogPostComponent },
     { path: 'plan-journey', component: PlanJourneyComponent },
+    { path: 'reset-password', component: ResetPasswordComponent },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
     { path: 'dashboard', canActivate: [AuthGuard], component: DashboardComponent },

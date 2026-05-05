@@ -1,0 +1,8 @@
+Test Case,Description,Expected Result,Status (Pass/Fail),Comments
+Payment - Valid Payment,User completes payment with valid details,Payment is processed and confirmed,,
+Payment - Invalid Payment,User submits invalid payment details,Form validation error, no payment made,,
+Payment - Payment Failure,Payment fails due to insufficient funds,Error message displayed, payment not processed,,
+Payment - Wallet Top-up,User tops up wallet,Wallet balance is updated,,
+Payment - View Transactions,User views payment transactions,All transactions are listed,,
+Payment - Refund,User requests a refund,Refund is processed and status updated,,
+Payment - Edge: Network Error,Network/server error during payment,User sees generic error message,,

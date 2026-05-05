@@ -1,0 +1,9 @@
+Test Case,Description,Expected Result,Status (Pass/Fail),Actual
+Login - Valid Credentials,User enters correct email and password,User is logged in and redirected to dashboard,,Pass
+Login - Invalid Credentials,User enters incorrect email or password,Error message displayed, login fails,Pass
+Login - Empty Fields,User submits empty email or password,Form validation error, no request sent,Pass
+Login - Remember Me,User checks 'Remember Me',Session persists after browser close,,Need to  implement
+Login - Locked Account,User tries to login with locked account,Error message displayed, login fails,Not implemented
+Login - Google Login,User logs in with Google,User is logged in and redirected,,Pass
+Login - Expired Session,Session expires,User is logged out and redirected to login,,Pass
+Login - Forgot Password,User clicks forgot password,Reset password flow is triggered,,Pass

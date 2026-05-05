@@ -1,0 +1,7 @@
+Test Case,Description,Expected Result,Status (Pass/Fail),Comments
+Profile - View Profile,User views profile,Profile info is displayed,,
+Profile - Edit Profile,User edits and saves profile,Profile is updated and confirmation shown,,
+Profile - Invalid Edit,User submits invalid profile data,Form validation error, no update,,
+Profile - Change Password,User changes password,Password is updated and confirmation shown,,
+Profile - Change Password Invalid,User submits invalid password,Form validation error, no update,,
+Profile - Edge: Network Error,Network/server error during profile action,User sees generic error message,,

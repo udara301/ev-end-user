@@ -1,0 +1,9 @@
+Test Case,Description,Expected Result,Expected,Actual
+Signup - Valid Data,User enters valid registration details,Account created, redirected or confirmation shown,Pass
+Signup - Existing Email,User tries to register with existing email,Error message displayed, signup fails,Pass
+Signup - Invalid Data,User enters invalid or incomplete data,Form validation error, no request sent,Pass
+Signup - Password Mismatch,User enters mismatched passwords,Form validation error, no request sent,Pass
+Signup - Password Policy,User enters weak password,Form validation error, no request sent,Pass
+Signup - Email Format,User enters invalid email format,Form validation error, no request sent,Pass
+Signup - Terms Not Accepted,User does not accept terms,Form validation error, no request sent,Pass
+Signup - Success Email,User completes signup,Confirmation email is sent,,Need to implement
