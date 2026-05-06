@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { VehicleService } from '../../services/vehicle.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vehicles',
@@ -15,7 +16,7 @@ export class VehiclesComponent {
   selectedCategory: string = 'car';
   selectedVehicles: any = null;
 
-  constructor(private vehicleService: VehicleService) { }
+  constructor(private vehicleService: VehicleService, private router: Router) { }
 
   ngOnInit() {
     this.vehicleService.getAllVehiclesByCategory().subscribe((data: any) => {
@@ -34,5 +35,11 @@ export class VehiclesComponent {
       console.log('Filtered Vehicles:', this.selectedVehicles);
     }
     console.log('Selected Category:', this.selectedCategory);
+  }
+
+  bookVehicle(vehicle: any) {
+    // Implement booking logic here
+    this.router.navigate(['//search']);
+    // console.log('Booking vehicle:', vehicle);
   }
 }

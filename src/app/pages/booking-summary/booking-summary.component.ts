@@ -69,10 +69,11 @@ export class BookingSummaryComponent implements OnInit {
   pickupTime = '';
   dropoffTime = '';
 
-  timeSlots = Array.from({ length: 24 }, (_, i) => {
-    const hour24 = i.toString().padStart(2, '0') + ':00';
-    const period = i < 12 ? 'AM' : 'PM';
-    const hour12 = i === 0 ? 12 : i > 12 ? i - 12 : i;
+  timeSlots = Array.from({ length: 15 }, (_, i) => {
+    const hour = 6 + i;
+    const hour24 = hour.toString().padStart(2, '0') + ':00';
+    const period = hour < 12 ? 'AM' : 'PM';
+    const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
     return { value: hour24, label: `${hour12}:00 ${period}` };
   });
 

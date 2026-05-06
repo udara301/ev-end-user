@@ -1,3 +1,4 @@
+
 import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -31,6 +32,10 @@ export class BookingsTabComponent implements OnInit {
     payingBookingId: number | null = null;
     paymentError = '';
 
+    // Pagination
+    page = 1;
+    pageSize = 5;
+
     constructor(
         private bookingService: BookingService,
         private paymentService: PaymentService,
@@ -57,9 +62,24 @@ export class BookingsTabComponent implements OnInit {
         this.isLoading = false;
     }
 
+
     get filteredBookings(): Booking[] {
         if (this.activeFilter === 'all') return this.bookings;
         return this.bookings.filter(b => b.booking_status.toLowerCase() === this.activeFilter);
+    }
+
+    get pagedBookings(): Booking[] {
+        const start = (this.page - 1) * this.pageSize;
+        return this.filteredBookings.slice(start, start + this.pageSize);
+    }
+
+    get totalPages(): number {
+        return Math.ceil(this.filteredBookings.length / this.pageSize) || 1;
+    }
+
+    goToPage(page: number): void {
+        if (page < 1 || page > this.totalPages) return;
+        this.page = page;
     }
 
     setFilter(filter: 'all' | 'active' | 'confirmed' | 'pending' | 'completed'): void {
@@ -191,5 +211,26 @@ export class BookingsTabComponent implements OnInit {
                 this.paymentError = err?.error?.message || 'Failed to initiate payment. Please try again.';
             }
         });
+    }
+
+    formatDate(dateStr: string): string {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        const options: Intl.DateTimeFormatOptions = {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+        };
+        return date.toLocaleDateString('en-US', options);
+    }
+
+    formatTime(timeStr: string): string {
+        if (!timeStr) return '';
+        // timeStr is expected as 'HH:mm:ss'
+        const [h, m] = timeStr.split(':');
+        const date = new Date();
+        date.setHours(Number(h), Number(m), 0, 0);
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
     }
 }
