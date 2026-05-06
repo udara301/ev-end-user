@@ -5,8 +5,13 @@
   (profileUpdated)="onProfileUpdated()">
 </app-edit-profile>
 
+<app-change-password *ngIf="showChangePassword"
+  (back)="closeChangePassword()"
+  (passwordChanged)="onProfileUpdated()">
+</app-change-password>
+
 <!-- Profile View -->
-<div *ngIf="!showEditProfile" class="space-y-4 lg:grid lg:grid-cols-3 lg:gap-6 lg:space-y-0">
+<div *ngIf="!showEditProfile && !showChangePassword" class="space-y-4 lg:grid lg:grid-cols-3 lg:gap-6 lg:space-y-0">
     <!-- Avatar & Name -->
     <div class="lg:col-span-1 lg:self-start">
         <div class="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -45,7 +50,7 @@
                     <span class="material-icons text-slate-400">chevron_right</span>
                 </div>
 
-                <div
+                <div (click)="openChangePassword()"
                     class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm cursor-pointer transition hover:shadow-md">
                     <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
                         <span class="material-icons text-lg">lock</span>

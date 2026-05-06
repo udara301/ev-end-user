@@ -44,16 +44,29 @@ export class AuthService {
         return this.http.post(`${environment.apiUrl}/auth/forgot-password`, { email });
     }
 
-     resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/auth/reset-password`, { token, newPassword });
-  }
-  
+    resetPassword(token: string, newPassword: string): Observable<any> {
+        return this.http.post(`${environment.apiUrl}/auth/reset-password`, { token, newPassword });
+    }
+
     getProfile() {
         return this.http.get(`${environment.apiUrl}/auth/me`);
     }
-    
+
+
     updateCustomerProfile(profileData: any) {
         return this.http.put(`${environment.apiUrl}/auth/me`, profileData);
+    }
+
+    /**
+     * Change password for logged-in user
+     * @param currentPassword Current password
+     * @param newPassword New password
+     */
+    changePassword(currentPassword: string, newPassword: string): Observable<any> {
+        return this.http.post(`${environment.apiUrl}/auth/change-password`, {
+            currentPassword,
+            newPassword
+        });
     }
 
     setToken(token: string, isLocalStorage?: boolean) {
