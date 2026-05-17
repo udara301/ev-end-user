@@ -81,6 +81,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
   private connectWebSocket(): void {
     console.log('Connecting to WebSocket for charger updates...');
     this.wsSubscription = this.webSocketService.connect().subscribe((message) => {
+      
       if (message?.type === 'charging_started') {
         this.checkActiveSession();
       } else if (message?.type === 'charging_stopped') {
@@ -111,6 +112,21 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
             connectors: this.searchResult.connectors.map(c => {
               if (c.connector_id?.toString() === message.connectorId?.toString()) {
                 return { ...c, durationMs: message.durationMs || 0, energyUsed: message.energyUsed || 0, amount: message.amount || 0 };
+              }
+              return c;
+            })
+          };
+        }
+      } else if (message?.type === 'connector_status_updated') {
+        if (this.searchResult && this.searchResult.id?.toString() === message.chargerId?.toString()) {
+          this.searchResult = {
+            ...this.searchResult,
+            connectors: this.searchResult.connectors.map(c => {
+              if (message.connectorId == null) {
+                return { ...c, status: message.status || c.status };
+              }
+              if (c.connector_id?.toString() === message.connectorId?.toString()) {
+                return { ...c, status: message.status || c.status };
               }
               return c;
             })
