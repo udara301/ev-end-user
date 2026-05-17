@@ -61,7 +61,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
     private chargerService: ChargerService,
     private toast: ToastService,
     private webSocketService: WebSocketService
-  ) {}
+  ) { }
 
   // QR Scanner
   isScanning = false;
@@ -74,16 +74,22 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
   readonly nearbyLink = '/charging-network';
 
   ngOnInit(): void {
-    this.checkActiveSession();
+    this.checkActiveSessionOrRequestedSession();
     this.connectWebSocket();
   }
+
+  // THERE ARE THREE METHOD FOR SEARCHING CHARGER
+  // 1. Serach Charger manually
+  // 2. Scan QR Code from the charger controller page
+  // 3. Scan QR Code from the phone camera app and redirect to the charger control page.
 
   private connectWebSocket(): void {
     console.log('Connecting to WebSocket for charger updates...');
     this.wsSubscription = this.webSocketService.connect().subscribe((message) => {
-      
+
       if (message?.type === 'charging_started') {
-        this.checkActiveSession();
+        
+        // this.checkActiveSession();
       } else if (message?.type === 'charging_stopped') {
         this.activeSession = null;
         this.liveDurationMs = 0;
@@ -99,8 +105,8 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
       } else if (message?.type === 'meter_update') {
         // Update active session live data
         if (this.activeSession &&
-            this.activeSession.charger_id?.toString() === message.chargerId?.toString() &&
-            this.activeSession.connector_id?.toString() === message.connectorId?.toString()) {
+          this.activeSession.charger_id?.toString() === message.chargerId?.toString() &&
+          this.activeSession.connector_id?.toString() === message.connectorId?.toString()) {
           this.liveDurationMs = message.durationMs || 0;
           this.liveEnergyUsed = message.energyUsed || 0;
           this.liveAmount = message.amount || 0;
@@ -136,29 +142,29 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
     });
   }
 
-  private checkActiveSession(): void {
+  private checkActiveSessionOrRequestedSession(): void {
     this.chargerService.getActiveSession().subscribe({
       next: (res) => {
         this.activeSession = res?.active_session || null;
-        if (!this.activeSession) {
-          this.handlePendingCharger();
+        if (this.activeSession) {
+          this.toast.info('You have an active charging session.');
+        }
+        else {
+          this.handleRequestedChargerSearch(); // to load searched charger via qr code directly
         }
       },
       error: () => {
-        this.handlePendingCharger();
+        this.handleRequestedChargerSearch();
       }
     });
   }
 
-  private handlePendingCharger(): void {
-    const pendingCharger = localStorage.getItem('ev_pending_charger');
-    if (pendingCharger) {
+  // ev pending charger flow is used when QR is scanned directly  without logged in
+  private handleRequestedChargerSearch(): void {
+    const requestedCharger = localStorage.getItem('ev_pending_charger');
+    if (requestedCharger) {
       localStorage.removeItem('ev_pending_charger');
-      if (this.activeSession) {
-        this.toast.error('You already have an ongoing charging session.');
-      } else {
-        this.onChargerIdentified(pendingCharger);
-      }
+      this.searchChargerFromId(requestedCharger);
     }
   }
 
@@ -209,7 +215,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
         if (barcodes.length > 0) {
           const value = barcodes[0].rawValue;
           this.stopScanner();
-          this.onChargerIdentified(value);
+          this.searchChargerFromId(value);
         }
       } catch {
         // detection frame error, continue scanning
@@ -229,17 +235,15 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
     this.isScanning = false;
   }
 
+  // Search by  Charger name manually (ocpp_id)
   submitManualId(): void {
     const id = this.manualChargerId.trim();
     if (!id) return;
-    if (this.activeSession) {
-      this.toast.error('You already have an ongoing charging session.');
-      return;
-    }
-    this.onChargerIdentified(id);
+    // search for the charger
+    this.searchChargerFromId(id);
   }
 
-  private onChargerIdentified(chargerId: string): void {
+  private searchChargerFromId(chargerId: string): void {
     this.manualChargerId = '';
     if (this.activeSession) {
       this.toast.error('You already have an ongoing charging session.');
@@ -266,14 +270,13 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
 
   startCharging(connector: Connector): void {
     if (!this.searchResult) return;
-    this.chargingConnectorIds.add(connector.id);
-
+    // this.chargingConnectorIds.add(connector.id);
     this.chargerService.startCharging(this.searchResult.id, connector.connector_id).subscribe({
       next: () => {
-        connector.status = 'CHARGING';
+        connector.status = 'PENDING';
       },
       error: (err) => {
-        this.chargingConnectorIds.delete(connector.id);
+        // this.chargingConnectorIds.delete(connector.id);
         this.toast.error(err.error?.message || 'Failed to start charging.');
       }
     });
@@ -285,7 +288,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
     this.chargerService.stopCharging(this.searchResult.id, connector.connector_id).subscribe({
       next: () => {
         this.chargingConnectorIds.delete(connector.id);
-        connector.status = 'AVAILABLE';
+        connector.status = 'PENDING';
       },
       error: (err) => {
         this.toast.error(err.error?.message || 'Failed to stop charging.');
@@ -324,6 +327,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
       case 'AVAILABLE': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
       case 'CHARGING': return 'text-cyan-600 bg-cyan-50 border-cyan-200';
       case 'FAULTED': return 'text-red-600 bg-red-50 border-red-200';
+      case 'PENDING': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       default: return 'text-slate-600 bg-slate-50 border-slate-200';
     }
   }
