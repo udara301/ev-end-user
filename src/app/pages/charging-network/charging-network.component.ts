@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { GoogleMapsModule, MapInfoWindow, MapMarker } from '@angular/google-maps';
 import { PublicChargersService } from '../../services/public-chargers.service';
 import { environment } from '../../../environments/environment';
+import { ChargerService } from '../../services/charger.service';
+import { forkJoin } from 'rxjs';
 
 interface Connector {
   id: number;
@@ -23,7 +25,6 @@ interface PublicCharger {
   is_verified: number;
   image_url: string | null;
   created_at: string;
-  submitted_by_name: string;
   connectors: Connector[];
 }
 
@@ -39,6 +40,7 @@ export class ChargingNetworkComponent implements OnInit {
 
   chargers: PublicCharger[] = [];
   filteredChargers: PublicCharger[] = [];
+  mappableChargers: PublicCharger[] = [];
   isLoading = true;
   mapReady = false;
   selectedCharger: PublicCharger | null = null;
@@ -58,7 +60,7 @@ export class ChargingNetworkComponent implements OnInit {
   mapOptions: google.maps.MapOptions = {};
   markerOptions: google.maps.MarkerOptions = {};
 
-  constructor(private publicChargersService: PublicChargersService) {}
+  constructor(private publicChargersService: PublicChargersService, private chargerService: ChargerService) {}
 
   ngOnInit(): void {
     this.loadGoogleMapsScript().then(() => {
@@ -102,9 +104,13 @@ export class ChargingNetworkComponent implements OnInit {
   }
 
   private loadChargers(): void {
-    this.publicChargersService.getPublicChargers().subscribe({
-      next: (data: PublicCharger[]) => {
-        this.chargers = data;
+    forkJoin([
+      this.publicChargersService.getPublicChargers(),
+      this.chargerService.getAllChargers()
+    ]).subscribe({
+      next: ([publicChargers, travelWithEvChargers]: [PublicCharger[], any[]]) => {
+        const mappedTravelWithEvChargers = (travelWithEvChargers || []).map((charger) => this.mapTravelWithEvCharger(charger));
+        this.chargers = [...(publicChargers || []), ...mappedTravelWithEvChargers];
         this.buildFilterOptions();
         this.applyFilters();
         this.isLoading = false;
@@ -113,6 +119,30 @@ export class ChargingNetworkComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  private mapTravelWithEvCharger(charger: any): PublicCharger {
+    const locationText = [charger.street_name, charger.city].filter(Boolean).join(', ');
+    const placeName = (charger.location || charger.ocpp_id || 'TravelWithEV Charger') as string;
+
+    return {
+      id: Number(charger.charger_id || 0),
+      submitted_by: Number(charger.agent?.id || 0),
+      place_name: placeName,
+      description: locationText || `OCPP ID: ${charger.ocpp_id || '-'}`,
+      latitude: String(charger.latitude ?? ''),
+      longitude: String(charger.longitude ?? ''),
+      charger_network: 'TravelWithEV',
+      is_verified: Number(charger.is_active ? 1 : 0),
+      image_url: null,
+      created_at: String(charger.created_at || ''),
+      connectors: (charger.connectors || []).map((connector: any) => ({
+        id: Number(connector.id || 0),
+        charger_id: Number(charger.charger_id || 0),
+        connector_type: String(connector.connector_type || 'Unknown'),
+        charger_capacity: String(connector.max_power_kw || '0')
+      }))
+    };
   }
 
   private buildFilterOptions(): void {
@@ -138,6 +168,13 @@ export class ChargingNetworkComponent implements OnInit {
       if (this.selectedVerification === 'unverified' && charger.is_verified) return false;
       return true;
     });
+    this.mappableChargers = this.filteredChargers.filter((charger) => this.hasValidCoordinates(charger));
+  }
+
+  private hasValidCoordinates(charger: PublicCharger): boolean {
+    const lat = parseFloat(charger.latitude);
+    const lng = parseFloat(charger.longitude);
+    return !isNaN(lat) && !isNaN(lng);
   }
 
   clearFilters(): void {

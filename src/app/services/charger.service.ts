@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 export class ChargerService {
     private base = `${environment.apiUrl}/chargers`;
     private chargesBase = `${environment.apiUrl}/charges`;
+    private publicBase = `${environment.apiUrl}/public`;
 
     constructor(private http: HttpClient) { }
 
@@ -35,5 +36,8 @@ export class ChargerService {
             .set('limit', limit);
 
         return this.http.get<any>(`${this.chargesBase}/history`, { params });
+    }
+    getAllChargers(): Observable<any> {
+        return this.http.get<any>(`${this.publicBase}/chargers`);
     }
 }
