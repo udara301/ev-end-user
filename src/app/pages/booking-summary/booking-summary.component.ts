@@ -187,6 +187,7 @@ export class BookingSummaryComponent implements OnInit {
          payment,
           {
             onCompleted: (completedOrderId: string) => {
+              console.log('Payment completed for order ID:', completedOrderId);
               this.ngZone.run(() => {
                 this.isSubmitting = false;
                 const successState = {
