@@ -166,8 +166,9 @@ export class BookingSummaryComponent implements OnInit {
         const payment = {
           "sandbox": true,
           "merchant_id": environment.payhereMerchantId,
-          "return_url": "https://travelwithev.com/booking-success", // once payment is success inform to backend
-          "notify_url": "https://travelwithev.com/api/v1/payments/notify", // once payment is done inform to backend 
+          "return_url": "https://travelwithev.com/booking-success", // පේමන්ට් එක සාර්ථක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
+          "cancel_url": "https://travelwithev.com/booking-cancel",
+          "notify_url": "https://travelwithev.com/api/v1/payments/notify", // පේමන්ට් එක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
           "order_id": orderId.toString(),
           "items": `${this.bookingData.vehicle.brand} ${this.bookingData.vehicle.model_name} Rental`,
           "amount": amountFormatted,
