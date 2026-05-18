@@ -53,6 +53,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
   processingConnectorIds = new Set<number>(); // This set is used to avoid mulitple clicks while request handling
   isStoppingActiveSession = false;
   private wsSubscription?: Subscription;
+  private durationTimerId: ReturnType<typeof setInterval> | null = null;
 
   // Live meter data for active session
   liveDurationSeconds = 0;
@@ -99,15 +100,17 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
         this.liveDurationSeconds = 0;
         this.liveEnergyUsed = 0;
         this.liveAmount = 0;
+        this.stopDurationTimer();
         this.getActiveSessionDetails();
       } else if (message?.type === 'meter_update') {
         // Update active session live data
         if (this.activeSession &&
           this.activeSession.charger_id?.toString() === message.chargerId?.toString() &&
           this.activeSession.connector_id?.toString() === message.connectorId?.toString()) {
-          this.liveDurationSeconds = message.durationSeconds || 0;
+          this.liveDurationSeconds = message.durationSeconds ?? this.liveDurationSeconds;
           this.liveEnergyUsed = message.energyUsed || 0;
           this.liveAmount = message.amount || 0;
+          this.startDurationTimer();
         }
         // Update search result connector live data
         if (this.searchResult && this.searchResult.id?.toString() === message.chargerId?.toString()) {
@@ -115,7 +118,12 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
             ...this.searchResult,
             connectors: this.searchResult.connectors.map(c => {
               if (c.connector_id?.toString() === message.connectorId?.toString()) {
-                return { ...c, durationSeconds: message.durationSeconds || 0, energyUsed: message.energyUsed || 0, amount: message.amount || 0 };
+                return {
+                  ...c,
+                  durationSeconds: message.durationSeconds ?? c.durationSeconds ?? 0,
+                  energyUsed: message.energyUsed || 0,
+                  amount: message.amount || 0
+                };
               }
               return c;
             })
@@ -145,9 +153,14 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.activeSession = res?.active_session || null;
         if (this.activeSession) {
+          this.bootstrapLiveDuration();
+          this.startDurationTimer();
+          this.liveEnergyUsed = this.activeSession.meter_stop - this.activeSession.meter_start || 0;
+          this.liveAmount = this.activeSession.est_cost || 0;
           this.toast.info('You have an active charging session.');
         }
         else {
+          this.stopDurationTimer();
           this.handleRequestedChargerSearch(); // to load searched charger via qr code directly
         }
       },
@@ -162,6 +175,13 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
       next: (res) => {
         const session = res?.active_session || null;
         this.activeSession = session;
+
+        if (session) {
+          this.bootstrapLiveDuration();
+          this.startDurationTimer();
+        } else {
+          this.stopDurationTimer();
+        }
 
         if (
           this.searchResult &&
@@ -181,6 +201,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.activeSession = null;
+        this.stopDurationTimer();
       }
     });
   }
@@ -196,8 +217,55 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopScanner();
+    this.stopDurationTimer();
     this.wsSubscription?.unsubscribe();
     this.webSocketService.disconnect();
+  }
+
+  private bootstrapLiveDuration(): void {
+    if (!this.activeSession?.start_time) return;
+
+    const startedAt = new Date(this.activeSession.start_time).getTime();
+    if (Number.isNaN(startedAt)) return;
+
+    const now = Date.now();
+    this.liveDurationSeconds = Math.max(Math.floor((now - startedAt) / 1000), 0);
+  }
+
+  private startDurationTimer(): void {
+    if (this.durationTimerId || !this.activeSession) return;
+
+    this.durationTimerId = setInterval(() => {
+      if (!this.activeSession) {
+        this.stopDurationTimer();
+        return;
+      }
+
+      this.liveDurationSeconds += 1;
+      this.incrementActiveConnectorDuration();
+    }, 1000);
+  }
+
+  private stopDurationTimer(): void {
+    if (!this.durationTimerId) return;
+
+    clearInterval(this.durationTimerId);
+    this.durationTimerId = null;
+  }
+
+  private incrementActiveConnectorDuration(): void {
+    if (!this.searchResult || !this.activeSession) return;
+    if (this.searchResult.id?.toString() !== this.activeSession.charger_id?.toString()) return;
+
+    this.searchResult = {
+      ...this.searchResult,
+      connectors: this.searchResult.connectors.map((c) => {
+        if (c.connector_id?.toString() === this.activeSession.connector_id?.toString()) {
+          return { ...c, durationSeconds: (c.durationSeconds || 0) + 1 };
+        }
+        return c;
+      })
+    };
   }
 
   async startScanner(): Promise<void> {
@@ -355,6 +423,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
         this.liveDurationSeconds = 0;
         this.liveEnergyUsed = 0;
         this.liveAmount = 0;
+        this.stopDurationTimer();
         this.processingConnectorIds.delete(connector_id);
         this.isStoppingActiveSession = false;
       },
