@@ -77,6 +77,7 @@ export class BookingSummaryComponent implements OnInit {
     return { value: hour24, label: `${hour12}:00 ${period}` };
   });
 
+
   ngOnInit(): void {
     this.loadSummaryData();
   }
@@ -163,28 +164,28 @@ export class BookingSummaryComponent implements OnInit {
         const amountFormatted = Number(amount).toFixed(2);
         // Temp usage 
         const payment = {
-            "sandbox": true,
-            "merchant_id": environment.payhereMerchantId,
-            "return_url": "https://travelwithev.com/booking-success", // පේමන්ට් එක සාර්ථක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
-            "cancel_url": "https://travelwithev.com/booking-cancel",
-            "notify_url": "https://travelwithev.com/api/v1/payments/notify", // පේමන්ට් එක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
-            "order_id": orderId.toString(),
-            "items": `${this.bookingData.vehicle.brand} ${this.bookingData.vehicle.model_name} Rental`,
-            "amount": amountFormatted,
-            "currency": currency,
-            "hash": hashRes.hash, // අර අපි හදපු hash එක
-            "first_name": "Saman",
-            "last_name": "Perera",
-            "email": "samanp@gmail.com",
-            "phone": "0771234567",
-            "address": "No.1, Galle Road",
-            "city": "Colombo",
-            "country": "Sri Lanka",
+          "sandbox": true,
+          "merchant_id": environment.payhereMerchantId,
+          "return_url": "https://travelwithev.com/booking-success", // පේමන්ට් එක සාර්ථක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
+          "cancel_url": "https://travelwithev.com/booking-cancel",
+          "notify_url": "https://travelwithev.com/api/v1/payments/notify", // පේමන්ට් එක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
+          "order_id": orderId.toString(),
+          "items": `${this.bookingData.vehicle.brand} ${this.bookingData.vehicle.model_name} Rental`,
+          "amount": amountFormatted,
+          "currency": currency,
+          "hash": hashRes.hash, // අර අපි හදපු hash එක
+          "first_name": "Saman",
+          "last_name": "Perera",
+          "email": "samanp@gmail.com",
+          "phone": "0771234567",
+          "address": "No.1, Galle Road",
+          "city": "Colombo",
+          "country": "Sri Lanka",
         };
 
 
         this.paymentService.startPayment(
-         payment,
+          payment,
           {
             onCompleted: (completedOrderId: string) => {
               console.log('Payment completed for order ID:', completedOrderId);
@@ -201,7 +202,23 @@ export class BookingSummaryComponent implements OnInit {
                 };
                 this.localStorageService.clearSearchCriteria();
                 this.localStorageService.clearSelectedVehicle();
-                this.router.navigate(['/booking-success'], { state: successState });
+                if (orderId) {
+                  this.bookingService.getBookingById(parseInt(orderId)).subscribe(booking => {
+                    console.log("booking details", booking)
+                    if (booking.booking_status == "confirmed") {
+                      this.router.navigate(['/booking-success'], { state: successState });
+                    } else if (booking.booking_status == "pending") {
+                      this.router.navigate(['/booking-cancel'], {
+                        state: {
+                          orderId: orderId,
+                          errorMessage: 'Payment was cancelled. Your booking is pending — you can retry payment.',
+                        }
+                      });
+                    } else {
+                       this.router.navigate(['/dashboard'])
+                    }
+                  })
+                }
               });
             },
             onDismissed: () => {
@@ -271,7 +288,7 @@ export class BookingSummaryComponent implements OnInit {
 
     this.vehicleService.getVehicleById(selectedVehicle.modelId).subscribe({
       next: (vehicle: any) => {
-        
+
         this.bookingData.vehicle = {
           vehicle_id: vehicle?.vehicle_id,
           model_id: vehicle?.model_id,
