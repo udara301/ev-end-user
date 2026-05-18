@@ -28,4 +28,12 @@ export class ChargerService {
     getActiveSession(): Observable<any> {
         return this.http.get<any>(`${this.chargesBase}/active-session`);
     }
+
+    getChargeHistory(page = 1, limit = 10): Observable<any> {
+        const params = new HttpParams()
+            .set('page', page)
+            .set('limit', limit);
+
+        return this.http.get<any>(`${this.chargesBase}/history`, { params });
+    }
 }

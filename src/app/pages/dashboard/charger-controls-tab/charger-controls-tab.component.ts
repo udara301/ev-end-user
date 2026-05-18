@@ -15,7 +15,7 @@ interface Connector {
   max_power_kw: string;
   output_voltage: string;
   amperage: string | null;
-  durationMs?: number;
+  durationSeconds?: number;
   energyUsed?: number;
   amount?: number;
 }
@@ -49,11 +49,13 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
   isLoading = false;
   searchResult: Charger | null = null;
   activeSession: any = null;
-  chargingConnectorIds = new Set<number>();
+  // chargingConnectorIds = new Set<number>();
+  processingConnectorIds = new Set<number>(); // This set is used to avoid mulitple clicks while request handling
+  isStoppingActiveSession = false;
   private wsSubscription?: Subscription;
 
   // Live meter data for active session
-  liveDurationMs = 0;
+  liveDurationSeconds = 0;
   liveEnergyUsed = 0;
   liveAmount = 0;
 
@@ -72,6 +74,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
 
   // Quick actions
   readonly nearbyLink = '/charging-network';
+  readonly chargingHistoryLink = '/dashboard';
 
   ngOnInit(): void {
     this.checkActiveSessionOrRequestedSession();
@@ -88,26 +91,21 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
     this.wsSubscription = this.webSocketService.connect().subscribe((message) => {
 
       if (message?.type === 'charging_started') {
-        
-        // this.checkActiveSession();
+        // updating the status of the connectors by requesting the actual active session from the db
+        this.getActiveSessionDetails();
+        this.toast.success('Charging session started.');
       } else if (message?.type === 'charging_stopped') {
         this.activeSession = null;
-        this.liveDurationMs = 0;
+        this.liveDurationSeconds = 0;
         this.liveEnergyUsed = 0;
         this.liveAmount = 0;
-        if (this.searchResult) {
-          this.chargerService.search(this.searchResult.ocpp_id).subscribe({
-            next: (result) => {
-              if (result?.ocpp_id) this.searchResult = result;
-            }
-          });
-        }
+        this.getActiveSessionDetails();
       } else if (message?.type === 'meter_update') {
         // Update active session live data
         if (this.activeSession &&
           this.activeSession.charger_id?.toString() === message.chargerId?.toString() &&
           this.activeSession.connector_id?.toString() === message.connectorId?.toString()) {
-          this.liveDurationMs = message.durationMs || 0;
+          this.liveDurationSeconds = message.durationSeconds || 0;
           this.liveEnergyUsed = message.energyUsed || 0;
           this.liveAmount = message.amount || 0;
         }
@@ -117,7 +115,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
             ...this.searchResult,
             connectors: this.searchResult.connectors.map(c => {
               if (c.connector_id?.toString() === message.connectorId?.toString()) {
-                return { ...c, durationMs: message.durationMs || 0, energyUsed: message.energyUsed || 0, amount: message.amount || 0 };
+                return { ...c, durationSeconds: message.durationSeconds || 0, energyUsed: message.energyUsed || 0, amount: message.amount || 0 };
               }
               return c;
             })
@@ -155,6 +153,34 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.handleRequestedChargerSearch();
+      }
+    });
+  }
+
+  private getActiveSessionDetails(): void {
+    this.chargerService.getActiveSession().subscribe({
+      next: (res) => {
+        const session = res?.active_session || null;
+        this.activeSession = session;
+
+        if (
+          this.searchResult &&
+          this.activeSession &&
+          this.searchResult.id?.toString() === this.activeSession.charger_id?.toString()
+        ) {
+          this.searchResult = {
+            ...this.searchResult,
+            connectors: this.searchResult.connectors.map(c => {
+              if (c.connector_id?.toString() === this.activeSession.connector_id?.toString()) {
+                return { ...c, status: this.activeSession.status || 'CHARGING' };
+              }
+              return c;
+            })
+          };
+        }
+      },
+      error: () => {
+        this.activeSession = null;
       }
     });
   }
@@ -269,50 +295,72 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
   }
 
   startCharging(connector: Connector): void {
-    if (!this.searchResult) return;
-    // this.chargingConnectorIds.add(connector.id);
+    if (!this.searchResult || this.processingConnectorIds.has(connector.connector_id)) return;
+
+    this.processingConnectorIds.add(connector.connector_id);
     this.chargerService.startCharging(this.searchResult.id, connector.connector_id).subscribe({
       next: () => {
         connector.status = 'PENDING';
+        this.processingConnectorIds.delete(connector.connector_id);
       },
       error: (err) => {
-        // this.chargingConnectorIds.delete(connector.id);
+        this.processingConnectorIds.delete(connector.connector_id);
+        if (this.searchResult) {
+          this.searchChargerFromId(this.searchResult.ocpp_id); // refresh charger details to get the actual connector status from backend
+        }
         this.toast.error(err.error?.message || 'Failed to start charging.');
       }
     });
   }
 
   stopCharging(connector: Connector): void {
-    if (!this.searchResult) return;
+    if (!this.searchResult || this.processingConnectorIds.has(connector.connector_id)) return;
 
+    this.processingConnectorIds.add(connector.connector_id);
     this.chargerService.stopCharging(this.searchResult.id, connector.connector_id).subscribe({
       next: () => {
-        this.chargingConnectorIds.delete(connector.id);
+        // this.chargingConnectorIds.delete(connector.id);
         connector.status = 'PENDING';
+        this.processingConnectorIds.delete(connector.connector_id);
       },
       error: (err) => {
+        this.processingConnectorIds.delete(connector.connector_id);
         this.toast.error(err.error?.message || 'Failed to stop charging.');
       }
     });
   }
 
-  isConnectorCharging(connector: Connector): boolean {
-    return this.chargingConnectorIds.has(connector.id);
+  // isConnectorCharging(connector: Connector): boolean {
+  //   return this.chargingConnectorIds.has(connector.id);
+  // }
+
+  isConnectorProcessing(connector: Connector): boolean {
+    return this.processingConnectorIds.has(connector.connector_id);
+  }
+
+  isActiveSessionStopping(): boolean {
+    return !!this.activeSession && this.processingConnectorIds.has(this.activeSession.connector_id);
   }
 
   stopActiveSession(): void {
-    if (!this.activeSession) return;
+    if (!this.activeSession || this.isStoppingActiveSession || this.isActiveSessionStopping()) return;
     const { charger_id, connector_id } = this.activeSession;
 
+    this.isStoppingActiveSession = true;
+    this.processingConnectorIds.add(connector_id);
     this.chargerService.stopCharging(charger_id, connector_id).subscribe({
       next: () => {
         this.toast.success('Charging session stopped successfully.');
         this.activeSession = null;
-        this.liveDurationMs = 0;
+        this.liveDurationSeconds = 0;
         this.liveEnergyUsed = 0;
         this.liveAmount = 0;
+        this.processingConnectorIds.delete(connector_id);
+        this.isStoppingActiveSession = false;
       },
       error: (err) => {
+        this.processingConnectorIds.delete(connector_id);
+        this.isStoppingActiveSession = false;
         this.toast.error(err.error?.message || 'Failed to stop charging session.');
       }
     });
@@ -332,13 +380,12 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatDuration(ms: number): string {
-    if (!ms) return '0m 0s';
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
-    return `${minutes}m ${seconds}s`;
+  formatDuration(seconds: number): string {
+    if (!seconds) return '0m 0s';
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    if (hours > 0) return `${hours}h ${minutes}m ${remainingSeconds}s`;
+    return `${minutes}m ${remainingSeconds}s`;
   }
 }

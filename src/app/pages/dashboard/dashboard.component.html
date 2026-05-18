@@ -26,6 +26,7 @@
       <div class="min-w-0 flex-1 lg:max-w-4xl">
         <app-bookings-tab *ngIf="activeTab === 'bookings'"></app-bookings-tab>
         <app-charger-controls-tab *ngIf="activeTab === 'charger'"></app-charger-controls-tab>
+        <app-charging-history-tab *ngIf="activeTab === 'history'"></app-charging-history-tab>
         <app-wallet-tab *ngIf="activeTab === 'wallet'"></app-wallet-tab>
         <app-profile-tab *ngIf="activeTab === 'profile'"></app-profile-tab>
       </div>

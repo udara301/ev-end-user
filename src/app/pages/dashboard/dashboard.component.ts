@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { BookingsTabComponent } from './bookings-tab/bookings-tab.component';
+import { ChargingHistoryTabComponent } from './charging-history-tab/charging-history-tab.component';
 import { ChargerControlsTabComponent } from './charger-controls-tab/charger-controls-tab.component';
 import { WalletTabComponent } from './wallet-tab/wallet-tab.component';
 import { ProfileTabComponent } from './profile-tab/profile-tab.component';
 
-type TabId = 'bookings' | 'charger' | 'wallet' | 'profile';
+type TabId = 'bookings' | 'charger' | 'history' | 'wallet' | 'profile';
 
 interface Tab {
   id: TabId;
@@ -21,6 +22,7 @@ interface Tab {
   imports: [
     CommonModule,
     BookingsTabComponent,
+    ChargingHistoryTabComponent,
     ChargerControlsTabComponent,
     WalletTabComponent,
     ProfileTabComponent
@@ -35,6 +37,7 @@ export class DashboardComponent implements OnInit {
   readonly tabs: Tab[] = [
     { id: 'bookings', label: 'Bookings', icon: 'directions_car' },
     { id: 'charger', label: 'Charger Controls', icon: 'ev_station' },
+    { id: 'history', label: 'Charging History', icon: 'history' },
     { id: 'wallet', label: 'Wallet', icon: 'account_balance_wallet' },
     { id: 'profile', label: 'Profile', icon: 'person' }
   ];
