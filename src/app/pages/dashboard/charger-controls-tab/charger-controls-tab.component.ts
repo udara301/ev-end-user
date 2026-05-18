@@ -54,6 +54,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
   isStoppingActiveSession = false;
   private wsSubscription?: Subscription;
   private durationTimerId: ReturnType<typeof setInterval> | null = null;
+  private isComponentDestroyed = false;
 
   // Live meter data for active session
   liveDurationSeconds = 0;
@@ -72,6 +73,8 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
   manualChargerId = '';
   private stream: MediaStream | null = null;
   private scanInterval: any = null;
+  private canvasContext: CanvasRenderingContext2D | null = null;
+  private jsQRLoaded = false;
 
   // Quick actions
   readonly nearbyLink = '/charging-network';
@@ -218,6 +221,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.stopScanner();
     this.stopDurationTimer();
+    this.isComponentDestroyed = true;
     this.wsSubscription?.unsubscribe();
     this.webSocketService.disconnect();
   }
@@ -268,9 +272,34 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
     };
   }
 
+  private extractChargerIdFromScan(value: string): string {
+    const raw = (value || '').trim();
+    if (!raw) return '';
+
+    const sanitize = (input: string): string => {
+      return input
+        .replace(/%22/gi, '')
+        .replace(/["']/g, '')
+        .replace(/[.,;:!?]+$/g, '')
+        .trim();
+    };
+
+    try {
+      const url = new URL(raw);
+      const parts = url.pathname.split('/').filter(Boolean);
+      const lastPart = parts.length ? decodeURIComponent(parts[parts.length - 1]) : raw;
+      return sanitize(lastPart);
+    } catch {
+      const parts = raw.split('/').filter(Boolean);
+      const lastPart = parts.length ? decodeURIComponent(parts[parts.length - 1]) : raw;
+      return sanitize(lastPart);
+    }
+  }
+
   async startScanner(): Promise<void> {
     this.scanError = '';
     this.isScanning = true;
+    this.isComponentDestroyed = false;
 
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
@@ -279,40 +308,163 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
 
       // Wait for the video element to be rendered
       setTimeout(() => {
-        if (this.videoElement?.nativeElement && this.stream) {
-          const video = this.videoElement.nativeElement;
-          video.srcObject = this.stream;
-          video.play();
-          this.startDetection(video);
+        if (this.isComponentDestroyed || !this.videoElement?.nativeElement || !this.stream) {
+          return;
+        }
+
+        const video = this.videoElement.nativeElement;
+
+        // Verify video element is still in the document
+        if (!document.body.contains(video)) {
+          this.scanError = 'Video element lost. Please try again.';
+          this.stopScanner();
+          return;
+        }
+
+        video.srcObject = this.stream;
+        const playPromise = video.play();
+
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              if (!this.isComponentDestroyed) {
+                this.startDetection(video);
+              }
+            })
+            .catch((err) => {
+              console.warn('Video play error:', err);
+              if (err.name === 'AbortError') {
+                this.scanError = 'Camera stream was interrupted. Please try again.';
+              } else {
+                this.scanError = 'Failed to start video. Please try again.';
+              }
+              this.stopScanner();
+            });
         }
       }, 100);
-    } catch {
+    } catch (err) {
       this.scanError = 'Camera access denied. Please allow camera permission or enter the charger ID manually.';
       this.isScanning = false;
     }
   }
 
   private startDetection(video: HTMLVideoElement): void {
-    if (!('BarcodeDetector' in window)) {
-      // Fallback: browser doesn't support BarcodeDetector
-      this.scanError = 'QR scanning is not supported on this browser. Please enter the charger ID manually.';
+    // Try to use BarcodeDetector first, fallback to jsQR
+    if ('BarcodeDetector' in window) {
+      this.startBarcodeDetection(video);
+    } else {
+      this.startJsQRDetection(video);
+    }
+  }
+
+  private startBarcodeDetection(video: HTMLVideoElement): void {
+    const detector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+
+    this.scanInterval = setInterval(async () => {
+      // Check if component is destroyed or video element is no longer in DOM
+      if (this.isComponentDestroyed || !document.body.contains(video)) {
+        this.stopScanner();
+        return;
+      }
+
+      if (video.readyState < 2) return;
+
+      try {
+        const barcodes = await detector.detect(video);
+        if (barcodes.length > 0) {
+          const value = this.extractChargerIdFromScan(barcodes[0].rawValue || '');
+          this.stopScanner();
+          this.searchChargerFromId(value);
+        }
+      } catch (err) {
+        // detection frame error or component destroyed, continue scanning if still active
+        if (this.isComponentDestroyed || !this.isScanning) {
+          this.stopScanner();
+        }
+      }
+    }, 300);
+  }
+
+  private startJsQRDetection(video: HTMLVideoElement): void {
+    // Load jsQR library if not already loaded
+    if (!this.jsQRLoaded) {
+      this.loadJsQRLibrary().then(() => {
+        this.startJsQRDetectionLoop(video);
+      });
+    } else {
+      this.startJsQRDetectionLoop(video);
+    }
+  }
+
+  private loadJsQRLibrary(): Promise<void> {
+    return new Promise((resolve) => {
+      if ((window as any).jsQR) {
+        this.jsQRLoaded = true;
+        resolve();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+      script.onload = () => {
+        this.jsQRLoaded = true;
+        resolve();
+      };
+      script.onerror = () => {
+        this.scanError = 'Failed to load QR scanner library. Please enter the charger ID manually.';
+        this.stopScanner();
+        resolve();
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  private startJsQRDetectionLoop(video: HTMLVideoElement): void {
+    // Create canvas for frame capture
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      this.scanError = 'Failed to create canvas. Please try again.';
       this.stopScanner();
       return;
     }
 
-    const detector = new (window as any).BarcodeDetector({ formats: ['qr_code'] });
+    this.canvasContext = ctx;
 
-    this.scanInterval = setInterval(async () => {
+    this.scanInterval = setInterval(() => {
+      // Check if component is destroyed or video element is no longer in DOM
+      if (this.isComponentDestroyed || !document.body.contains(video)) {
+        this.stopScanner();
+        return;
+      }
+
       if (video.readyState < 2) return;
+
       try {
-        const barcodes = await detector.detect(video);
-        if (barcodes.length > 0) {
-          const value = barcodes[0].rawValue;
+        // Update canvas size if video dimensions changed
+        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+        }
+
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        const jsQR = (window as any).jsQR;
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+        if (code) {
+          const value = this.extractChargerIdFromScan(code.data || '');
           this.stopScanner();
           this.searchChargerFromId(value);
         }
-      } catch {
-        // detection frame error, continue scanning
+      } catch (err) {
+        if (this.isComponentDestroyed || !this.isScanning) {
+          this.stopScanner();
+        }
       }
     }, 300);
   }
@@ -325,6 +477,11 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
     if (this.stream) {
       this.stream.getTracks().forEach(t => t.stop());
       this.stream = null;
+    }
+    if (this.videoElement?.nativeElement) {
+      const video = this.videoElement.nativeElement;
+      video.srcObject = null;
+      video.pause();
     }
     this.isScanning = false;
   }
