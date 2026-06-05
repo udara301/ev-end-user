@@ -21,6 +21,9 @@ import { ReturnPolicyComponent } from './pages/legal/return-policy.component';
 import { PlanJourneyComponent } from './pages/plan-journey/plan-journey.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { SingleBlogPostComponent } from './components/blog-section/single-blog-post.component';
+import { AffiliateSignupComponent } from './pages/affiliate-signup/affiliate-signup.component';
+import { AffiliateLoginComponent } from './pages/affiliate-login/affiliate-login.component';
+import { AffiliateDashboardComponent } from './pages/affiliate-dashboard/affiliate-dashboard.component';
 
 export const routes: Routes = [
     { path: '', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
@@ -28,7 +31,11 @@ export const routes: Routes = [
     { path: 'plan-journey', component: PlanJourneyComponent },
     { path: 'reset-password', component: ResetPasswordComponent },
     { path: 'login', component: LoginComponent },
+    { path: 'affiliate/login', component: AffiliateLoginComponent },
     { path: 'signup', component: SignupComponent },
+    { path: 'become-affiliate', component: AffiliateSignupComponent },
+    { path: 'affiliate/signup', component: AffiliateSignupComponent },
+    { path: 'affiliate/dashboard', canActivate: [AuthGuard], component: AffiliateDashboardComponent },
     { path: 'dashboard', canActivate: [AuthGuard], component: DashboardComponent },
     { path: 'search', component: SearchComponent },
     { path: 'booking-summary', component: BookingSummaryComponent },

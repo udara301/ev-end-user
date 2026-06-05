@@ -1,0 +1,139 @@
+<section class="relative min-h-screen overflow-hidden pt-28 pb-16">
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-gradient-to-tr from-secondary/10 via-white to-primary/10"></div>
+    <div class="absolute -top-16 left-12 h-72 w-72 rounded-full bg-secondary/25 blur-3xl"></div>
+    <div class="absolute -bottom-20 right-0 h-96 w-96 rounded-full bg-primary/15 blur-3xl"></div>
+  </div>
+
+  <div class="relative z-10 mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-12 lg:gap-12 lg:px-8">
+    <div class="relative overflow-hidden rounded-3xl bg-[#13305f] p-8 text-white shadow-2xl lg:col-span-7 lg:p-12">
+      <div class="absolute -right-8 top-4 h-40 w-40 rounded-full bg-tertiary/35 blur-2xl"></div>
+      <div class="absolute -left-12 bottom-10 h-48 w-48 rounded-full bg-secondary/35 blur-2xl"></div>
+
+      <div class="relative z-10 flex h-full flex-col justify-between gap-10">
+        <div>
+          <p class="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-secondary">Affiliate Program</p>
+          <h1 class="max-w-xl text-3xl font-extrabold leading-tight sm:text-4xl">Become a TravelWithEV affiliate partner.</h1>
+          <p class="mt-5 max-w-2xl text-sm text-blue-100 sm:text-base">Create your affiliate profile, share your referral channel, and start earning through EV travel conversions.</p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div class="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+            <p class="text-xs uppercase tracking-wider text-blue-100">Earn</p>
+            <p class="mt-2 text-2xl font-bold">Points</p>
+          </div>
+          <div class="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+            <p class="text-xs uppercase tracking-wider text-blue-100">Redeem</p>
+            <p class="mt-2 text-2xl font-bold">Cash</p>
+          </div>
+          <div class="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+            <p class="text-xs uppercase tracking-wider text-blue-100">Boost</p>
+            <p class="mt-2 text-2xl font-bold">Network</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-3xl border border-white/70 bg-white/80 p-8 shadow-2xl backdrop-blur-xl lg:col-span-5 lg:p-10">
+      <span class="mb-5 inline-flex items-center gap-2 rounded-full bg-secondary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-secondary">
+        <span class="material-icons text-sm">group_add</span>
+        Become an Affiliate
+      </span>
+
+      <h2 class="mb-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">Affiliate signup</h2>
+      <p class="mb-8 text-sm text-slate-600 sm:text-base">Set up your affiliate profile and start earning rewards.</p>
+
+      <form class="space-y-5" [formGroup]="affiliateSignupForm" (ngSubmit)="onSubmit()">
+        <div>
+          <label for="fullName" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Full Name</label>
+          <div class="relative">
+            <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">person</span>
+            <input id="fullName" type="text" placeholder="Your full name" formControlName="fullName" [readonly]="isSubmitting"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 outline-none transition focus:border-secondary focus:ring-2 focus:ring-secondary/30" />
+          </div>
+          <p *ngIf="hasControlError('fullName', 'required')" class="mt-2 text-sm text-rose-600">Full name is required.</p>
+          <p *ngIf="hasControlError('fullName', 'minlength')" class="mt-2 text-sm text-rose-600">Use at least 3 characters.</p>
+        </div>
+
+        <div>
+          <label for="email" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Email</label>
+          <div class="relative">
+            <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">mail</span>
+            <input id="email" type="email" placeholder="you@example.com" formControlName="email" [readonly]="isSubmitting"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 outline-none transition focus:border-secondary focus:ring-2 focus:ring-secondary/30" />
+          </div>
+          <p *ngIf="hasControlError('email', 'required')" class="mt-2 text-sm text-rose-600">Email is required.</p>
+          <p *ngIf="hasControlError('email', 'email')" class="mt-2 text-sm text-rose-600">Enter a valid email address.</p>
+        </div>
+
+        <div>
+          <label for="phone" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Phone Number</label>
+          <div class="relative">
+            <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">phone</span>
+            <input id="phone" type="tel" placeholder="+94 771234567" formControlName="phone" [readonly]="isSubmitting"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 outline-none transition focus:border-secondary focus:ring-2 focus:ring-secondary/30" />
+          </div>
+          <p *ngIf="hasControlError('phone', 'required')" class="mt-2 text-sm text-rose-600">Phone number is required.</p>
+          <p *ngIf="hasControlError('phone', 'pattern')" class="mt-2 text-sm text-rose-600">Use a valid Sri Lankan mobile number.</p>
+        </div>
+
+        <!-- <div>
+          <label for="affiliateCode" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Affiliate / Referral Code (Optional)</label>
+          <div class="relative">
+            <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">badge</span>
+            <input id="affiliateCode" type="text" placeholder="If you have an invite code" formControlName="affiliateCode" [readonly]="isSubmitting"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 outline-none transition focus:border-secondary focus:ring-2 focus:ring-secondary/30" />
+          </div>
+        </div> -->
+
+        <div>
+          <label for="password" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Password</label>
+          <div class="relative">
+            <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
+            <input id="password" type="password" placeholder="Create a password" formControlName="password" [readonly]="isSubmitting"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 outline-none transition focus:border-secondary focus:ring-2 focus:ring-secondary/30" />
+          </div>
+          <p *ngIf="hasControlError('password', 'required')" class="mt-2 text-sm text-rose-600">Password is required.</p>
+          <p *ngIf="hasControlError('password', 'minlength')" class="mt-2 text-sm text-rose-600">Use at least 8 characters.</p>
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Confirm Password</label>
+          <div class="relative">
+            <span class="material-icons pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">verified_user</span>
+            <input id="confirmPassword" type="password" placeholder="Confirm your password" formControlName="confirmPassword" [readonly]="isSubmitting"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 outline-none transition focus:border-secondary focus:ring-2 focus:ring-secondary/30" />
+          </div>
+          <p *ngIf="hasControlError('confirmPassword', 'required')" class="mt-2 text-sm text-rose-600">Please confirm your password.</p>
+          <p *ngIf="affiliateSignupForm.hasError('passwordMismatch') && confirmPasswordControl?.touched" class="mt-2 text-sm text-rose-600">Passwords do not match.</p>
+        </div>
+
+        <label class="flex cursor-pointer items-start gap-2 text-sm text-slate-600">
+          <input type="checkbox" formControlName="acceptTerms" [disabled]="isSubmitting"
+            class="mt-0.5 h-4 w-4 rounded border-slate-300 text-secondary focus:ring-secondary" />
+          I agree to the Affiliate Program terms and platform policies.
+        </label>
+        <p *ngIf="hasControlError('acceptTerms', 'required')" class="-mt-3 text-sm text-rose-600">You must accept the terms to continue.</p>
+
+        <div *ngIf="apiError" class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {{ apiError }}
+        </div>
+
+        <button type="submit" [disabled]="isSubmitting"
+          class="w-full rounded-xl bg-secondary px-5 py-3 font-bold text-white shadow-lg shadow-secondary/30 transition hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ isSubmitting ? 'Creating Affiliate Account...' : 'Create Affiliate Account' }}
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-slate-600">
+        Already have an account?
+        <a routerLink="/affiliate/login" class="font-bold text-primary hover:text-primary/80">Log in</a>
+      </p>
+
+      <p class="mt-3 text-center text-sm text-slate-600">
+        Looking for customer access?
+        <a routerLink="/login" class="font-bold text-tertiary hover:text-tertiary/80">Customer login</a>
+      </p>
+    </div>
+  </div>
+</section>

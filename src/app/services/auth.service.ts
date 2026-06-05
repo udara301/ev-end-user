@@ -11,6 +11,13 @@ export interface SignupPayload {
     password: string;
 }
 
+export interface AffiliateSignupPayload {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+}
+
 export interface LoginPayload {
     email: string;
     password: string;
@@ -31,8 +38,18 @@ export class AuthService {
     }
 
 
+    affiliateSignup(body: AffiliateSignupPayload) {
+        return this.http.post(`${environment.apiUrl}/affiliates/signup`, body);
+    }
+
+
     login(body: LoginPayload) {
         return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login/customer`, body);
+    }
+
+
+    affiliateLogin(body: LoginPayload) {
+        return this.http.post<LoginResponse>(`${environment.apiUrl}/affiliates/login`, body);
     }
 
 

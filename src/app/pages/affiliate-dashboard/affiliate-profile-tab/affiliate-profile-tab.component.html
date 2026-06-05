@@ -1,0 +1,119 @@
+<div class="space-y-4 lg:grid lg:grid-cols-3 lg:gap-6 lg:space-y-0">
+  <div class="lg:col-span-1 lg:self-start">
+    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary to-cyan-500 text-3xl font-black text-white">
+        {{ profile?.name ? profile.name.charAt(0).toUpperCase() : 'A' }}
+      </div>
+      <h3 class="mt-3 text-lg font-bold text-slate-900">{{ profile?.name || 'Affiliate Partner' }}</h3>
+      <p class="text-sm text-slate-500">{{ profile?.email || '-' }}</p>
+      <p class="mt-1 text-xs text-slate-400">{{ profile?.phone || profile?.phone_number || '' }}</p>
+
+      <button (click)="logout()"
+        class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-600 transition hover:bg-red-100">
+        <span class="material-icons text-lg">logout</span>
+        Sign Out
+      </button>
+    </div>
+  </div>
+
+  <div class="lg:col-span-2 space-y-4">
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">Basic Details</h3>
+      <p class="mt-2 text-sm text-slate-600">Keep your affiliate profile details up to date.</p>
+
+      <form class="mt-4 space-y-4" [formGroup]="basicDetailsForm" (ngSubmit)="saveBasicDetails()">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="affiliateName" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Name</label>
+            <input id="affiliateName" type="text" formControlName="name" [readonly]="isProfileSaving"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30" />
+            <p *ngIf="hasBasicError('name', 'required')" class="mt-2 text-xs text-rose-600">Name is required.</p>
+            <p *ngIf="hasBasicError('name', 'minlength')" class="mt-2 text-xs text-rose-600">Use at least 3 characters.</p>
+          </div>
+
+          <div>
+            <label for="affiliatePhone" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Phone Number</label>
+            <input id="affiliatePhone" type="text" formControlName="phone_number" [readonly]="isProfileSaving"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30" />
+            <p *ngIf="hasBasicError('phone_number', 'required')" class="mt-2 text-xs text-rose-600">Phone number is required.</p>
+            <p *ngIf="hasBasicError('phone_number', 'pattern')" class="mt-2 text-xs text-rose-600">Use a valid Sri Lankan mobile number.</p>
+          </div>
+        </div>
+
+        <div *ngIf="profileErrorMessage" class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+          {{ profileErrorMessage }}
+        </div>
+
+        <div *ngIf="profileSuccessMessage" class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          {{ profileSuccessMessage }}
+        </div>
+
+        <button type="submit" [disabled]="isProfileSaving"
+          class="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60">
+          {{ isProfileSaving ? 'Saving...' : 'Save Basic Details' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">Change Password</h3>
+      <p class="mt-2 text-sm text-slate-600">Update your affiliate account password regularly for better security.</p>
+
+      <form class="mt-4 space-y-4" [formGroup]="passwordForm" (ngSubmit)="updatePassword()">
+        <div>
+          <label for="currentPassword" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Current Password</label>
+          <input id="currentPassword" type="password" formControlName="currentPassword" [readonly]="isPasswordSaving"
+            class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30" />
+          <p *ngIf="hasPasswordError('currentPassword', 'required')" class="mt-2 text-xs text-rose-600">Current password is required.</p>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label for="newPassword" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">New Password</label>
+            <input id="newPassword" type="password" formControlName="newPassword" [readonly]="isPasswordSaving"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30" />
+            <p *ngIf="hasPasswordError('newPassword', 'required')" class="mt-2 text-xs text-rose-600">New password is required.</p>
+            <p *ngIf="hasPasswordError('newPassword', 'minlength')" class="mt-2 text-xs text-rose-600">Use at least 8 characters.</p>
+          </div>
+
+          <div>
+            <label for="confirmPassword" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Confirm Password</label>
+            <input id="confirmPassword" type="password" formControlName="confirmPassword" [readonly]="isPasswordSaving"
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30" />
+            <p *ngIf="hasPasswordError('confirmPassword', 'required')" class="mt-2 text-xs text-rose-600">Please confirm your password.</p>
+            <p *ngIf="passwordForm.value.newPassword && confirmPasswordControl?.touched && passwordForm.value.newPassword !== passwordForm.value.confirmPassword"
+              class="mt-2 text-xs text-rose-600">Passwords do not match.</p>
+          </div>
+        </div>
+
+        <div *ngIf="passwordErrorMessage" class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+          {{ passwordErrorMessage }}
+        </div>
+
+        <div *ngIf="passwordSuccessMessage" class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          {{ passwordSuccessMessage }}
+        </div>
+
+        <button type="submit" [disabled]="isPasswordSaving"
+          class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60">
+          {{ isPasswordSaving ? 'Updating...' : 'Update Password' }}
+        </button>
+      </form>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">Affiliate Program Notes</h3>
+      <ul class="mt-3 space-y-2 text-sm text-slate-600">
+        <li>Share only your official affiliate codes from the Codes tab.</li>
+        <li>Points are credited when referred bookings are completed successfully.</li>
+        <li>Use the Redeem tab to convert points into available payout cards.</li>
+      </ul>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">Support</h3>
+      <p class="mt-2 text-sm text-slate-600">Need campaign support or payout help? Reach out to affiliate support at</p>
+      <p class="mt-1 text-sm font-bold text-primary">affiliates&#64;travelwithev.com</p>
+    </div>
+  </div>
+</div>

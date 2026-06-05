@@ -1,0 +1,45 @@
+<section class="min-h-screen bg-slate-50 pb-20 pt-20 sm:pt-28 lg:pb-8">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="mb-6">
+      <p class="text-sm text-slate-500">Affiliate workspace</p>
+      <h1 class="text-2xl font-black text-slate-900 lg:text-3xl">Welcome, {{ affiliateName }}</h1>
+      <p class="mt-1 text-sm text-slate-500">Manage codes, track points, and redeem your rewards.</p>
+    </div>
+
+    <div class="lg:flex lg:gap-8">
+      <nav class="hidden lg:block lg:w-56 lg:shrink-0">
+        <div class="sticky top-28 space-y-1">
+          <button *ngFor="let tab of tabs"
+            (click)="setTab(tab.id)"
+            class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition"
+            [ngClass]="activeTab === tab.id
+              ? 'bg-secondary/10 text-secondary'
+              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'">
+            <span class="material-icons text-xl">{{ tab.icon }}</span>
+            <span>{{ tab.label }}</span>
+          </button>
+        </div>
+      </nav>
+
+      <div class="min-w-0 flex-1 lg:max-w-4xl">
+        <app-affiliate-overview-tab *ngIf="activeTab === 'overview'"></app-affiliate-overview-tab>
+        <app-affiliate-code-tab *ngIf="activeTab === 'codes'"></app-affiliate-code-tab>
+        <app-affiliate-points-tab *ngIf="activeTab === 'points'"></app-affiliate-points-tab>
+        <app-affiliate-redeem-tab *ngIf="activeTab === 'redeem'"></app-affiliate-redeem-tab>
+        <app-affiliate-profile-tab *ngIf="activeTab === 'profile'"></app-affiliate-profile-tab>
+      </div>
+    </div>
+  </div>
+
+  <nav class="safe-area-bottom fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 backdrop-blur-lg lg:hidden">
+    <div class="mx-auto flex max-w-lg items-center justify-around px-2 py-1">
+      <button *ngFor="let tab of tabs"
+        (click)="setTab(tab.id)"
+        class="flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-semibold transition"
+        [ngClass]="activeTab === tab.id ? 'text-secondary' : 'text-slate-400'">
+        <span class="material-icons text-[22px]">{{ tab.icon }}</span>
+        <span>{{ tab.label }}</span>
+      </button>
+    </div>
+  </nav>
+</section>
