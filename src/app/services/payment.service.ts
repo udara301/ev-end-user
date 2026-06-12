@@ -14,6 +14,19 @@ export interface PaymentHashResponse {
     hash: string;
 }
 
+export interface ApplyCouponResponse {
+    message: string;
+    coupon: {
+        id: number;
+        code: string;
+        label: string;
+        discount_pct_per_renting: number;
+    };
+    amount: number;
+    discount_amount: number;
+    discounted_value: number;
+}
+
 declare var payhere: any;
 
 @Injectable({ providedIn: 'root' })
@@ -28,6 +41,13 @@ export class PaymentService {
 
     initiatePayment(data: { booking_id: number | string; amount: number; method: string }): Observable<{ message: string; paymentId: number }> {
         return this.http.post<{ message: string; paymentId: number }>(`${this.base}/initiate`, data);
+    }
+
+    applyCoupon(couponCode: string, amount: number): Observable<ApplyCouponResponse> {
+        return this.http.post<ApplyCouponResponse>(`${environment.apiUrl}/coupons/apply-booking`, {
+            coupon_code: couponCode,
+            amount: amount
+        });
     }
 
     startPayment(
@@ -57,7 +77,7 @@ export class PaymentService {
         payhere.onError = callbacks.onError;
 
         const payment = {
-            sandbox: !environment.production,
+            sandbox: false,
             ...paymentData,
             amount: Number(paymentData.amount).toFixed(2),
             notify_url: `${environment.apiUrl}/payments/notify`,

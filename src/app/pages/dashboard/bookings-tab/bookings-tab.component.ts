@@ -140,7 +140,7 @@ export class BookingsTabComponent implements OnInit {
                         const amountFormatted = Number(amount).toFixed(2);
 
                         const payment: any = {
-                            sandbox: true,
+                            sandbox: false,
                             merchant_id: environment.payhereMerchantId,
                             return_url: 'https://travelwithev.com/booking-success',
                             cancel_url: 'https://travelwithev.com/booking-cancel',

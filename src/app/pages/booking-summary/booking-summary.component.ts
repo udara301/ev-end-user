@@ -7,7 +7,7 @@ import { LocalStorageService } from '../../services/localStorage.service';
 import { VehicleService } from '../../services/vehicle.service';
 import { BookingService } from '../../services/booking.service';
 import { ToastService } from '../../services/toast.service';
-import { PaymentService } from '../../services/payment.service';
+import { PaymentService, ApplyCouponResponse } from '../../services/payment.service';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 
@@ -69,6 +69,12 @@ export class BookingSummaryComponent implements OnInit {
   pickupTime = '';
   dropoffTime = '';
 
+  // Promo code properties
+  promoCode = '';
+  promoApplied: ApplyCouponResponse | null = null;
+  promoError = '';
+  isApplyingPromo = false;
+
   timeSlots = Array.from({ length: 15 }, (_, i) => {
     const hour = 6 + i;
     const hour24 = hour.toString().padStart(2, '0') + ':00';
@@ -91,7 +97,47 @@ export class BookingSummaryComponent implements OnInit {
   }
 
   get totalCost(): number {
-    return this.subtotal + this.pickupReturnCost;
+    const baseCost = this.subtotal + this.pickupReturnCost;
+    // If promo is applied, return the discounted value (which includes the discount)
+    if (this.promoApplied) {
+      return this.promoApplied.discounted_value;
+    }
+    return baseCost;  
+  }
+
+  get discountAmount(): number {
+    return this.promoApplied?.discount_amount ?? 0;
+  }
+
+  applyPromoCode(): void {
+    if (!this.promoCode.trim()) {
+      this.promoError = 'Please enter a promo code.';
+      return;
+    }
+
+    this.isApplyingPromo = true;
+    this.promoError = '';
+    const baseCost = this.subtotal + this.pickupReturnCost;
+
+    this.paymentService.applyCoupon(this.promoCode.trim(), baseCost).subscribe({
+      next: (response) => {
+        this.promoApplied = response;
+        this.promoError = '';
+        this.toast.success(`Promo code applied! You save Rs: ${response.discount_amount.toFixed(2)}`);
+        this.isApplyingPromo = false;
+      },
+      error: (err) => {
+        this.promoApplied = null;
+        this.promoError = err?.error?.message || 'Invalid promo code or expired. Please try another.';
+        this.isApplyingPromo = false;
+      }
+    });
+  }
+
+  removePromoCode(): void {
+    this.promoCode = '';
+    this.promoApplied = null;
+    this.promoError = '';
   }
 
   goBack(): void {
@@ -117,7 +163,11 @@ export class BookingSummaryComponent implements OnInit {
       this.pickupTime,
       this.bookingData.dropoffDate,
       this.dropoffTime,
-      this.totalCost
+      this.totalCost,
+      this.promoApplied ? this.promoCode.trim() : undefined,
+      this.promoApplied ? this.discountAmount : undefined,
+      this.promoApplied ? this.subtotal + this.pickupReturnCost : undefined
+
     ).subscribe({
       next: (res: any) => {
         const orderId = res?.bookingId ?? res?.order_id ?? res?.id;
@@ -164,7 +214,7 @@ export class BookingSummaryComponent implements OnInit {
         const amountFormatted = Number(amount).toFixed(2);
         // Temp usage 
         const payment = {
-          "sandbox": true,
+          "sandbox": false,
           "merchant_id": environment.payhereMerchantId,
           "return_url": "https://travelwithev.com/booking-success", // පේමන්ට් එක සාර්ථක වුණාම backend එකට මැසේජ් එක එන්නේ මෙතනට
           "cancel_url": "https://travelwithev.com/booking-cancel",
@@ -173,7 +223,7 @@ export class BookingSummaryComponent implements OnInit {
           "items": `${this.bookingData.vehicle.brand} ${this.bookingData.vehicle.model_name} Rental`,
           "amount": amountFormatted,
           "currency": currency,
-          "hash": hashRes.hash, 
+          "hash": hashRes.hash,
           "first_name": firstName,
           "last_name": lastName,
           "email": user?.email || '',
@@ -215,7 +265,7 @@ export class BookingSummaryComponent implements OnInit {
                         }
                       });
                     } else {
-                       this.router.navigate(['/dashboard'])
+                      this.router.navigate(['/dashboard'])
                     }
                   })
                 }

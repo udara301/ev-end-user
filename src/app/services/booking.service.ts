@@ -24,14 +24,17 @@ export class BookingService {
         return this.http.get<any[]>(`${this.base}/search`, { params });
     }
 
-    placeBooking(vehicleId: number, pickupDate: string, pickupTime: string, dropoffDate: string, dropoffTime: string, totalPrice: number): Observable<any> {
+    placeBooking(vehicleId: number, pickupDate: string, pickupTime: string, dropoffDate: string, dropoffTime: string, totalPrice: number, coupon_code?: string, discount_applied?: number, total_price_before_discount?: number): Observable<any> {
         const body = {
             vehicle_id: vehicleId,
             pickup_date: pickupDate,
             pickup_time: pickupTime,
             dropoff_date: dropoffDate,
             dropoff_time: dropoffTime,
-            total_price: totalPrice 
+            total_price: totalPrice,
+            coupon_code : coupon_code,
+            discount_applied : discount_applied,
+            total_price_before_discount : total_price_before_discount
         };
         return this.http.post(`${this.base}/place`, body);
     }

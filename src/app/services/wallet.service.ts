@@ -71,7 +71,7 @@ export class WalletService {
         payhere.onError = callbacks.onError;
 
         const payment = {
-            sandbox: true,
+            sandbox: false,
             merchant_id: topupData.merchant_id,
             return_url: `${environment.apiUrl}/wallet/topup/return`,
             cancel_url: `${environment.apiUrl}/wallet/topup/cancel`,
