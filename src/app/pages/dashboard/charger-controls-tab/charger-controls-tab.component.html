@@ -114,7 +114,7 @@
       </div>
       <div class="bg-white px-4 py-3">
         <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Meter</p>
-        <p class="mt-0.5 text-sm font-semibold text-slate-900">{{ activeSession.meter_start }} kWh</p>
+        <p class="mt-0.5 text-sm font-semibold text-slate-900">{{ activeSession.meter_start }} Wh</p>
       </div>
     </div>
 
@@ -129,7 +129,7 @@
         </div>
         <div class="text-center">
           <span class="material-icons text-cyan-500 text-lg">bolt</span>
-          <p class="mt-1 text-lg font-bold text-slate-900">{{ liveEnergyUsed | number:'1.2-2' }} kWh</p>
+          <p class="mt-1 text-lg font-bold text-slate-900">{{ liveEnergyUsed | number:'1.2-2' }} Wh</p>
           <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Energy Used</p>
         </div>
         <div class="text-center">
@@ -243,7 +243,7 @@
             </div>
             <div class="flex items-center gap-1.5 text-xs text-slate-600">
               <span class="material-icons text-sm text-cyan-500">bolt</span>
-              <span class="font-semibold">{{ (connector.energyUsed || 0) | number:'1.2-2' }} kWh</span>
+              <span class="font-semibold">{{ (connector.energyUsed || 0) | number:'1.2-2' }} Wh</span>
             </div>
             <div class="flex items-center gap-1.5 text-xs text-slate-600">
               <span class="material-icons text-sm text-cyan-500">payments</span>
