@@ -158,7 +158,7 @@ export class ChargerControlsTabComponent implements OnInit, OnDestroy {
         if (this.activeSession) {
           this.bootstrapLiveDuration();
           this.startDurationTimer();
-          this.liveEnergyUsed = this.activeSession.meter_stop - this.activeSession.meter_start || 0;
+          this.liveEnergyUsed = (this.activeSession.meter_stop - this.activeSession.meter_start)/1000 || 0;
           this.liveAmount = this.activeSession.est_cost || 0;
           this.toast.info('You have an active charging session.');
         }
